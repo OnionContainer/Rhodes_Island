@@ -1,6 +1,40 @@
 {
+    "x":0,
     "type":"Scene",
-    "props":{"width":1200,"sceneColor":"#0099ff","height":800},
+    "selectedBox":2,
+    "selecteID":3,
+    "searchKey":"Scene",
+    "props":{"width":1200,"sceneColor":"#0099ff","runtime":"SceneScript/Loading.ts","height":800},
+    "nodeParent":-1,
+    "maxID":4,
+    "label":"Scene",
+    "isOpen":true,
+    "isDirectory":true,
+    "isAniNode":true,
+    "hasChild":true,
+    "compId":2,
     "child":[
-        ]
+        {
+            "x":15,
+            "type":"Text",
+            "searchKey":"Text",
+            "props":{"y":346,"x":192.5,"width":815,"text":"ShowMeTheCode","height":108,"fontSize":100,"color":"#6c2120"},
+            "nodeParent":2,
+            "label":"Text",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":3,
+            "child":[
+                ]
+        }],
+    "animations":[
+        {
+            "nodes":[
+                ],
+            "name":"ani1",
+            "id":1,
+            "frameRate":24,
+            "action":0
+        }]
 }

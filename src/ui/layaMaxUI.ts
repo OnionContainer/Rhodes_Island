@@ -4,13 +4,21 @@ import Dialog=Laya.Dialog;
 import Scene=Laya.Scene;
 var REG: Function = Laya.ClassUtils.regClass;
 export module ui {
-    export class MainFieldUI extends Scene {
+    export class GameFieldSceneUI extends Scene {
 		public UISet:Laya.Sprite;
         constructor(){ super()}
         createChildren():void {
             super.createChildren();
-            this.loadScene("MainField");
+            this.loadScene("GameFieldScene");
         }
     }
-    REG("ui.MainFieldUI",MainFieldUI);
+    REG("ui.GameFieldSceneUI",GameFieldSceneUI);
+    export class LoadingSceneUI extends Scene {
+        constructor(){ super()}
+        createChildren():void {
+            super.createChildren();
+            this.loadScene("LoadingScene");
+        }
+    }
+    REG("ui.LoadingSceneUI",LoadingSceneUI);
 }

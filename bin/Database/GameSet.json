@@ -26,7 +26,7 @@
             [790,2000]
         ]
     },
-    "timetable":[
+    "timetableBref":[
         {"time": 0, "type": "bug0", "path":"I"},
         {"time": 500, "type":"bug0","path":"II"}
     ]

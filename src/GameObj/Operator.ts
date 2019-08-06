@@ -1,4 +1,4 @@
-import GameField from "../SceneScript/MainField"
+import GameField from "../SceneScript/GameField"
 import {basic} from "./People"
 
 export default class Operator extends basic.People{

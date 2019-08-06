@@ -1,4 +1,4 @@
 <page>
-   <item name="MainField.scene" props="" ifExport="分离模式" aName=""/>
+   <item name="GameFieldScene.scene" props="" ifExport="分离模式" aName=""/>
    <item name="LoadingScene.scene" props="" ifExport="分离模式" aName=""/>
 </page>
