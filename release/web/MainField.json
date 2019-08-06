@@ -1,0 +1,1 @@
+{"type":"Scene","props":{"width":1200,"runtime":"SceneScript/MainField.ts","height":800},"compId":2,"child":[{"type":"Sprite","props":{"name":"Test"},"compId":4},{"type":"Sprite","props":{"y":27,"x":-311,"texture":"Basic/Rec.png","name":"load"},"compId":8}],"loadList":["Basic/Rec.png"],"loadList3D":[]}
