@@ -2,6 +2,7 @@
     "ground":{
         "width": 10,
         "height": 6,
+        "size": 90,
         "matrix":[
             [0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0],
             [0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0  ,0],
@@ -26,7 +27,7 @@
             [790,2000]
         ]
     },
-    "timetable":[
+    "timetableBref":[
         {"time": 0, "type": "bug0", "path":"I"},
         {"time": 500, "type":"bug0","path":"II"}
     ]

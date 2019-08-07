@@ -1,6 +1,6 @@
 import {basic} from "./People"
-import {Grids} from "../SceneScript/Ground"
-import GameField from "../SceneScript/MainField"
+import {Grids} from "./Grids"
+import GameField from "../SceneScript/GameField"
 
 
 
