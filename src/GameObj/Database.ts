@@ -6,14 +6,11 @@ enemyDatabase_URL:string = "./Database/EnemyDatabase.json",
 operatorDatabase_URL:string = "./Database/OperatorDatabase.json"
 
 
-type EnemyData = {
-    name:string,
-    speed:number
-}
+
 
 type EnemyEvent = {
     time:number,
-    type:EnemyData,
+    type:string,
     path:number[][]
 }
 
@@ -28,15 +25,40 @@ export default class Database{
         this.operatorData = Laya.loader.getRes(operatorDatabase_URL)
         this.gameSet = Laya.loader.getRes(gameSet_URL)
         this.initTimeTable()
-        console.log(this)
     }
+
+
     private initTimeTable(){
         this.timeTable = new Struc.PointerList<EnemyEvent>()
         this.gameSet["timetableBref"].forEach(element => {
             const time:number = element["time"]
-            const type:EnemyData = this.enemyData[element["type"]]
+            const type:string = element["type"]
             const path:number[][] = this.gameSet["paths"][element.path]
             this.timeTable.push({time,type,path})
         });
     }
+
+
+
+
+    public isHappening(time:number):boolean{
+        return time === this.timeTable.read().time
+    }
+
+    public getPath(pathName:string):number[][]{
+        return this.gameSet["paths"][pathName]
+    }
+
+    public getEnemy(enemyName:string):any{
+        return this.enemyData[enemyName]
+    }
+
+    public getOperator(operatorName:string):any{
+        return this.operatorData[operatorName]
+    }
+
+    public getGround():any{
+        return this.gameSet["ground"]
+    }
+
 }

@@ -20,7 +20,7 @@ export default class GameField extends ui.GameFieldSceneUI{
     constructor(){
         super()
         this.database = new Database()
-        this.grids = new Grids(this.UISet,this,this.database)
+        this.grids = new Grids(this,this.UISet,this.database)
     }
 
 
