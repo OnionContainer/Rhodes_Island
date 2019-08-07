@@ -1,27 +1,54 @@
 import {basic} from "./People"
 import {Grids} from "./Grids"
 import GameField from "../SceneScript/GameField"
+import Database from "./Database";
 
 
 
-export default class Enemy extends basic.People{
-    constructor(father:Laya.Sprite,upperPath:GameField,data:any,path:number[][]){
-        super()
-        this.state.init(data,path)
-        this.present.init(father, "Basic/There-2.png", 0,0)
 
-        // this.state.speed = 5
-        // this.state.setAxisSpeed()
+
+export default class Enemy {
+
+    private upperPath:GameField
+    private father:Laya.Sprite
+    private data:any
+    private path:number[][]
+
+    private state
+    private present
+
+    constructor(upperPath:GameField, father:Laya.Sprite, enemyData:any, path:number[][]){
+        this.upperPath = upperPath
+        this.father = father
+        this.data = enemyData
+        this.path = path
+
         
-        this.update = ()=>{
-            // this.state.updatePosition()
-            // this.present.setPosition(this.state.position)
-            // this.state.isArrived() && this.state.nextAim()
-        }
-        
-        Laya.timer.once(2000,this,console.log,[this])
+        console.log("已新建敌人")
+        console.log(this)
+        console.log("已新建敌人")
     }
 }
+
+
+// export default class Enemy extends basic.People{
+//     constructor(father:Laya.Sprite,upperPath:GameField,data:any,path:number[][]){
+//         super()
+//         this.state.init(data,path)
+//         this.present.init(father, "Basic/There-2.png", 0,0)
+
+//         // this.state.speed = 5
+//         // this.state.setAxisSpeed()
+        
+//         this.update = ()=>{
+//             // this.state.updatePosition()
+//             // this.present.setPosition(this.state.position)
+//             // this.state.isArrived() && this.state.nextAim()
+//         }
+        
+//         Laya.timer.once(2000,this,console.log,[this])
+//     }
+// }
 
 
 
