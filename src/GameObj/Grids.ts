@@ -8,6 +8,8 @@ export class Grids{
     private father:Laya.Sprite
     private database:Database
 
+
+    
     private spriteGroup:Laya.Sprite[][] = []
     private rectGroup:Laya.Rectangle[][] = []
 

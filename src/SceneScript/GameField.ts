@@ -13,17 +13,36 @@ export default class GameField extends ui.GameFieldSceneUI{
     
     public database:Database
     public grids:Grids
-    private enemies:Enemy[]
-    private operators:Operator[]
+    private enemies:Enemy[] = []
+    private operators:Operator[] = []
     private doctor:Doctor 
+
+    private time_frame:number = 0
 
     constructor(){
         super()
         this.database = new Database()
         this.grids = new Grids(this,this.UISet,this.database)
+        
+
+        Laya.timer.loop(20,this,this.toLoop)
     }
 
+    public toLoop(){
+        while (this.database.isHappening(this.time_frame)) {
+            this.enemies.push(new Enemy(this,this.UISet,
+                this.database.readTimeEvent().typeData,
+                this.database.readTimeEvent().path,
+                this.database))
+            this.database.readTimeEventDone()
+        }
 
+        this.enemies.forEach(ele=>{
+            ele.update()
+        })
+
+        this.time_frame += 1
+    }
 
 
 

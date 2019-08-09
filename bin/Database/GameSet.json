@@ -24,12 +24,12 @@
             [400,400],
             [20,20],
             [20,200],
-            [790,2000]
+            [1090,600]
         ]
     },
     "timetableBref":[
         {"time": 0, "type": "bug0", "path":"I"},
-        {"time": 500, "type":"bug0","path":"II"}
+        {"time": 100, "type":"bug0","path":"II"}
     ]
 
 }

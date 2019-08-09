@@ -10,7 +10,7 @@ operatorDatabase_URL:string = "./Database/OperatorDatabase.json"
 
 type EnemyEvent = {
     time:number,
-    type:string,
+    typeData:any,
     path:number[][]
 }
 
@@ -32,9 +32,9 @@ export default class Database{
         this.timeTable = new Struc.PointerList<EnemyEvent>()
         this.gameSet["timetableBref"].forEach(element => {
             const time:number = element["time"]
-            const type:string = element["type"]
+            const typeData:any = this.enemyData[element["type"]]
             const path:number[][] = this.gameSet["paths"][element.path]
-            this.timeTable.push({time,type,path})
+            this.timeTable.push({time,typeData,path})
         });
     }
 
@@ -42,7 +42,15 @@ export default class Database{
 
 
     public isHappening(time:number):boolean{
-        return time === this.timeTable.read().time
+        return this.timeTable.read() && time === this.timeTable.read().time
+    }
+
+    public readTimeEvent():EnemyEvent{
+        return this.timeTable.read()
+    }
+
+    public readTimeEventDone():void{
+        this.timeTable.step()
     }
 
     public getPath(pathName:string):number[][]{
