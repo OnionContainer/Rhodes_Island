@@ -32,9 +32,14 @@ export default class GameField extends ui.GameFieldSceneUI{
         while (this.database.isHappening(this.time_frame)) {
             this.enemies.push(new Enemy(this,this.UISet,
                 this.database.readTimeEvent().typeData,
-                this.database.readTimeEvent().path))
+                this.database.readTimeEvent().path,
+                this.database))
             this.database.readTimeEventDone()
         }
+
+        this.enemies.forEach(ele=>{
+            ele.update()
+        })
 
         this.time_frame += 1
     }
