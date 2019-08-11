@@ -1,7 +1,13 @@
 {
     "bird":{
         "HP": 5,
-        "ATK": 20
+        "ATK": 20,
+        "img": "Basic/OperatorSample_A.png"
+    },
+    "sb":{
+        "HP": 12,
+        "ATK": 1,
+        "img": "Basic/OperatorSample_A.png"
     }
 
 

@@ -5,47 +5,89 @@ import Doctor from "../GameObj/Doctor"
 import Operator from "../GameObj/Operator"
 import {Struc} from "../DataStructure"
 import Database from "../GameObj/Database"
+// import GameEventManager from "../GameObj/GameEvent";
+import SideField from "../GameObj/SideField";
 const {log} = console;
 
+class GameEventManager{
+
+    private upperPath:GameField
+    private database:Database
+    
+
+    constructor(upperpath:GameField){
+        this.upperPath = upperpath
+        this.database = upperpath._database
+        this.init_dragFromSide()
+    }
+
+    private init_dragFromSide():void{
+        this.upperPath.sideField
+    }
+    
+}
 
 
 export default class GameField extends ui.GameFieldSceneUI{
     
-    public database:Database
-    public grids:Grids
-    private enemies:Enemy[] = []
-    private operators:Operator[] = []
-    private doctor:Doctor 
+    public _database:Database
+    public _grids:Grids
+    private _enemies:Enemy[] = []
+    private _operators:Operator[] = []
+    private _doctor:Doctor 
+    private _gameEventManager:GameEventManager
+    public sideField:SideField
 
-    private time_frame:number = 0
+    private _time_frame:number = 0
 
     constructor(){
         super()
-        this.database = new Database()
-        this.grids = new Grids(this,this.UISet,this.database)
-        
+        this._database = new Database()
+        this._grids = new Grids(this,this.UISet,this._database)
+        this.sideField = new SideField(this, this.UISet, ["bird","sb","bird"], this._database)//参数["bird"]将在选人功能完成后改为变量
+        // this._gameEventManager = new GameEventManager(this)
+        this.init_sideEvent()
 
         Laya.timer.loop(20,this,this.toLoop)
     }
 
     public toLoop(){
-        while (this.database.isHappening(this.time_frame)) {
-            this.enemies.push(new Enemy(this,this.UISet,
-                this.database.readTimeEvent().typeData,
-                this.database.readTimeEvent().path,
-                this.database))
-            this.database.readTimeEventDone()
+        while (this._database.isHappening(this._time_frame)) {
+            this._enemies.push(new Enemy(this,this.UISet,
+                this._database.readTimeEvent().typeData,
+                this._database.readTimeEvent().path,
+                this._database))
+            this._database.readTimeEventDone()
         }
 
-        this.enemies.forEach(ele=>{
+        this._enemies.forEach(ele=>{
             ele.update()
         })
 
-        this.time_frame += 1
+        this._time_frame += 1
     }
 
+    private init_sideEvent():void{
+        let toBuildEvents:Laya.Sprite[] = this.sideField.sideSprites    //从侧边栏中获取sprite
+        let data:any[] = this.sideField.sideData                        //从侧边栏中获取各个元素对应的干员数据
+        toBuildEvents.forEach((ele, index)=>{                           //为每个获取到的sprite设置点击事件
+            ele.on(Laya.Event.MOUSE_DOWN, this, this.onDrag, [data[index]])
+        })
+    }
 
-
+    private onDrag(data:any):void{
+        let spr:Laya.Sprite = Laya.Sprite.fromImage(data["img"])        //生成干员小人（就是从菜单里拽出来那个小人
+        spr.size(this._database.getGround()["size"],this._database.getGround()["size"]) //调整大小
+        this.UISet.addChild(spr)   //放进UISet
+        let draging:Function = ()=>{    //设置拖拽时的function
+            spr.pos(
+                this.UISet.mouseX,
+                this.UISet.mouseY
+            )
+        }
+        Laya.timer.loop(10, this, draging)  //设置拖拽循环
+        this.stage.on(Laya.Event.MOUSE_UP, this, ()=>{Laya.timer.clear(this,draging)})  //鼠标松开时停止拖拽循环
+    }
 
 }
 // export default class GameField extends ui.GameFieldSceneUI{
