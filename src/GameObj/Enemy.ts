@@ -108,9 +108,9 @@ export default class Enemy extends People{
 
         this._state = new EnemyState(this._data, path)
 
-        console.log("已新建敌人")
+        console.log("Enemy对象创建完成")
         console.log(this)
-        console.log("已新建敌人")
+        console.log("=== === ===")
     }
 
     public update():void{

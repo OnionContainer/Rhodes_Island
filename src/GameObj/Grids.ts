@@ -46,7 +46,7 @@ export class Grids{
         //创建游戏场地: End
         console.log("Grids对象创建完成")
         console.log(this)
-        console.log("Grids对象创建完成")
+        console.log("=== === ===")
     }
 }
 

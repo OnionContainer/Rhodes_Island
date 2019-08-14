@@ -7,25 +7,9 @@ import {Struc} from "../DataStructure"
 import Database from "../GameObj/Database"
 // import GameEventManager from "../GameObj/GameEvent";
 import SideField from "../GameObj/SideField";
+import EventCentre from "../EventCentre"
 const {log} = console;
 
-class GameEventManager{
-
-    private upperPath:GameField
-    private database:Database
-    
-
-    constructor(upperpath:GameField){
-        this.upperPath = upperpath
-        this.database = upperpath._database
-        this.init_dragFromSide()
-    }
-
-    private init_dragFromSide():void{
-        this.upperPath.sideField
-    }
-    
-}
 
 
 export default class GameField extends ui.GameFieldSceneUI{
@@ -35,20 +19,38 @@ export default class GameField extends ui.GameFieldSceneUI{
     private _enemies:Enemy[] = []
     private _operators:Operator[] = []
     private _doctor:Doctor 
-    private _gameEventManager:GameEventManager
     public sideField:SideField
 
     private _time_frame:number = 0
 
+    private _testFunc:Function
     constructor(){
         super()
+        ///////////////////////////////
+        this.stage.on("fuck", this, (a:string)=>{console.log(a)}, ["5"])
+        this.stage.event("fuck", ["6"])
+
+
+
+
+        ////////////////////////////////
         this._database = new Database()
         this._grids = new Grids(this,this.UISet,this._database)
         this.sideField = new SideField(this, this.UISet, ["bird","sb","bird"], this._database)//参数["bird"]将在选人功能完成后改为变量
         // this._gameEventManager = new GameEventManager(this)
-        this.init_sideEvent()
+        ///////////////////////////////
+
+        EventCentre.on("Global", "Spawn", this, this.newOperator)
+        EventCentre.on(EventCentre.Name.Global, "Spawn", this, this.newOperator)
+
+        ///////////////////////////////
 
         Laya.timer.loop(20,this,this.toLoop)
+    }
+
+    private newOperator(){
+        this._operators.push(new Operator(this, [0,0]))
+        console.log("Spawn Operator!!!!!!!")
     }
 
     public toLoop(){
@@ -67,27 +69,27 @@ export default class GameField extends ui.GameFieldSceneUI{
         this._time_frame += 1
     }
 
-    private init_sideEvent():void{
-        let toBuildEvents:Laya.Sprite[] = this.sideField.sideSprites    //从侧边栏中获取sprite
-        let data:any[] = this.sideField.sideData                        //从侧边栏中获取各个元素对应的干员数据
-        toBuildEvents.forEach((ele, index)=>{                           //为每个获取到的sprite设置点击事件
-            ele.on(Laya.Event.MOUSE_DOWN, this, this.onDrag, [data[index]])
-        })
-    }
+    // private init_sideEvent():void{
+    //     let toBuildEvents:Laya.Sprite[] = this.sideField.sideSprites    //从侧边栏中获取sprite
+    //     let data:any[] = this.sideField.sideData                        //从侧边栏中获取各个元素对应的干员数据
+    //     toBuildEvents.forEach((ele, index)=>{                           //为每个获取到的sprite设置点击事件
+    //         ele.on(Laya.Event.MOUSE_DOWN, this, this.onDrag, [data[index]])
+    //     })
+    // }
 
-    private onDrag(data:any):void{
-        let spr:Laya.Sprite = Laya.Sprite.fromImage(data["img"])        //生成干员小人（就是从菜单里拽出来那个小人
-        spr.size(this._database.getGround()["size"],this._database.getGround()["size"]) //调整大小
-        this.UISet.addChild(spr)   //放进UISet
-        let draging:Function = ()=>{    //设置拖拽时的function
-            spr.pos(
-                this.UISet.mouseX,
-                this.UISet.mouseY
-            )
-        }
-        Laya.timer.loop(10, this, draging)  //设置拖拽循环
-        this.stage.on(Laya.Event.MOUSE_UP, this, ()=>{Laya.timer.clear(this,draging)})  //鼠标松开时停止拖拽循环
-    }
+    // private onDrag(data:any):void{
+    //     let spr:Laya.Sprite = Laya.Sprite.fromImage(data["img"])        //生成干员小人（就是从菜单里拽出来那个小人
+    //     spr.size(this._database.getGround()["size"],this._database.getGround()["size"]) //调整大小
+    //     this.UISet.addChild(spr)   //放进UISet
+    //     let draging:Function = ()=>{    //设置拖拽时的function
+    //         spr.pos(
+    //             this.UISet.mouseX,
+    //             this.UISet.mouseY
+    //         )
+    //     }
+    //     Laya.timer.loop(10, this, draging)  //设置拖拽循环
+    //     this.stage.on(Laya.Event.MOUSE_UP, this, ()=>{Laya.timer.clear(this,draging)})  //鼠标松开时停止拖拽循环
+    // }
 
 }
 // export default class GameField extends ui.GameFieldSceneUI{

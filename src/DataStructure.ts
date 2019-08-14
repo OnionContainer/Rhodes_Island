@@ -1,6 +1,67 @@
 
+class HashMapNode<K,V>{
+    public key;
+    public value;
+    constructor(key:K, value:V){
+        this.key = key;
+        this.value = value;
+    }
+}
+
 export module Struc{
-    
+    export class HashMap<K,V>{
+        private _list:Array<HashMapNode<K,V>>
+        constructor(){
+            this._list = []
+        }
+        public get(key:K):V{
+            for (let ele of this._list){
+                if (ele.key === key) {
+                    return ele.value
+                }
+            }
+            return null
+        }
+        public getKeyByVal(val:V):K{
+            for (let ele of this._list) {
+                if (ele.value === val) {
+                    return ele.key
+                }
+            }
+            return null
+        }
+        public keyExist(key:K):boolean{
+            for (let ele of this._list) {
+                if (ele.key === key) {
+                    return true
+                }
+            }
+            return false
+        }
+        public set(key:K,value:V):void{
+            for (let n = 0; n < this._list.length; n += 1) {
+                if (this._list[n].key === key) {
+                    this._list[n].value = value
+                    return
+                }
+            }
+            this._list.push(new HashMapNode<K,V>(key,value))
+        }
+        public remove(key:K):boolean{
+            let count:number = 0;
+            for (let ele of this._list) {
+                if (ele.key === key) {
+                    this._list.splice(count,1);
+                    return true
+                }
+                count += 1;
+            }
+            return false
+        }
+        public get length():number{
+            return this._list.length
+        }
+    }
 
     export class PointerList<E>{
         private _list:Array<E> = []
