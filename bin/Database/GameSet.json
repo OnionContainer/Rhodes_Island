@@ -27,9 +27,10 @@
             [1090,600]
         ]
     },
-    "timetableBref":[
+    "timetable":[
         {"time": 0, "type": "bug0", "path":"I"},
-        {"time": 100, "type":"bug0","path":"II"}
+        {"time": 100, "type":"bug1","path":"II"}
     ]
 
 }
+

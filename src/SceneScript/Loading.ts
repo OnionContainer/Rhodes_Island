@@ -1,4 +1,5 @@
 import {ui} from "../ui/layaMaxUI"
+import EventCentre from "../Toybox/EventCentre";
 
 export default class Loading extends ui.LoadingSceneUI{
     constructor(){
@@ -10,7 +11,6 @@ export default class Loading extends ui.LoadingSceneUI{
     }
 
     onLoaded(){
-        Laya.Scene.open("GameFieldScene.scene")
-        // console.log(Laya.loader)
+        EventCentre.inst.event("Init", "Regular")
     }
 }
