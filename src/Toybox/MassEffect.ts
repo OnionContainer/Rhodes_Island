@@ -1,24 +1,24 @@
 import People from "../SceneScript/GameObj/People_stuff/People";
 import MyMath from "./myMath";
 import { Struc } from "./DataStructure";
-
-// 数据结构：ColiBox extends:Laya.Rectangle
-// follow:Laya.Sprite 需要跟随的sprite对象
-// deltaX:number:与跟随对象的横坐标差
-// deltaY:number:与跟随对象的纵坐标差
-
-// adjust():void修正自身的位置
-// tag:string:自身所属的碰撞箱种类
-// Owner:People:注册者
+import EventCentre from "./EventCentre";
 
 
-class ColiBox extends Laya.Rectangle{
-    /**
-     * @param none 不用传参数!
-     * 返回一个x,y,长宽为0的碰撞箱
-     */
-    constructor(){
+/**
+ * ColiBox是碰撞箱类
+ * 可以描述某一矩形实体的位置
+ */
+export class ColiBox extends Laya.Rectangle{
+
+    private registrant_:any;
+
+    public get registrant():ColiBox{
+        return this.registrant_;
+    }
+
+    constructor(register:any){
         super(0,0,0,0);
+        this.registrant_ = this.registrant_;
     }
 
     /**
@@ -32,7 +32,7 @@ class ColiBox extends Laya.Rectangle{
         const rad:Function = MyMath.randomInt;
         let result:ColiBox[] = [];
         for(let i = 0; i < 50; i += 1) {
-            result.push(new ColiBox());
+            result.push(new ColiBox(null));
             result[i].pos(rad(xRange), rad(yRange)).size(rad(widRange), rad(higRange));
         }
         return result;
@@ -67,24 +67,54 @@ class ColiBox extends Laya.Rectangle{
     }
 }
 
-/*
-*/
-class fuck extends Array<string>{
-    public you():string{
-        return "20";
-    }
-}
+/**
+ * ColiPareList是一个ColiBox数组
+ */
+export class ColiPareList{
 
-class ColiPareList extends Array<[ColiBox, ColiBox]>{
+    private array:[ColiBox, ColiBox][];
+
     constructor(){
-        super();
-        
+        this.array = [];
     }
 
+    //还原array接口
+    public get length():number{
+        return this.array.length;
+    }
+
+    public read(index:number):[ColiBox, ColiBox]{
+        return this.array[index];
+    }
+
+    public write(index:number, item:[ColiBox, ColiBox]):void{
+        this.array[index] = item;
+    }
+
+    public push(item:[ColiBox,ColiBox]):void{
+        this.array.push(item);
+    }
+
+    public splice(index:number, length:number):[ColiBox,ColiBox][]{
+        return this.array.splice(index,length);
+    }
+
+    /**
+     * 实现一下foreach
+     * @param f f:(ele:[ColiBox,ColiBox], index:number, arr:ColiPareList)=>void
+     * 
+     */
+    public foreach(f:(ele:[ColiBox,ColiBox], index:number, arr:ColiPareList)=>void):void{
+        for(let n = 0; n < this.array.length; n += 1) {
+            f(this.array[n],n,this);
+        }
+
+    }
+    
     public clone():ColiPareList{
-        let result:ColiPareList = new ColiPareList;
+        let result:ColiPareList = new ColiPareList();
         for(let n = 0; n < this.length; n += 1) {
-            result[n] = this[n];
+            result.write(n, this.read(n));
         }
         return result;
     }
@@ -94,18 +124,18 @@ class ColiPareList extends Array<[ColiBox, ColiBox]>{
      * @param newList 新碰撞关系表
      */
     public findChange(newList:ColiPareList):{in:ColiPareList,out:ColiPareList,remain:ColiPareList}{
-        let inList:ColiPareList = new ColiPareList();
-        let remainList:ColiPareList = new ColiPareList();
-        let me:ColiPareList = this.clone();//out list
+        let inList:ColiPareList = new ColiPareList();       //新产生的碰撞关系
+        let remainList:ColiPareList = new ColiPareList();   //维持原状的碰撞关系
+        let me:ColiPareList = this.clone();                 //解除的碰撞关系
 
         let found:boolean = false;
         for(let n = 0; n < newList.length; n += 1) {
             found = false;
-            let current:[ColiBox,ColiBox] = newList[n];
+            let current:[ColiBox,ColiBox] = newList.read(n);
 
 
             for (let k = 0; k < me.length; k += 1) {//look for duplicate element in me
-                let toCheck:[ColiBox,ColiBox] = me[k];
+                let toCheck:[ColiBox,ColiBox] = me.read(k);
                 if (current[0] === toCheck[0] && current[1] === toCheck[1]) {//pair duplicate = remain
                     remainList.push(current);
                     me.splice(k,1);//keep splicing the old array
@@ -126,85 +156,109 @@ class ColiPareList extends Array<[ColiBox, ColiBox]>{
             remain:remainList//所有新表和旧表都有的元素，就是“原本就在一起，现在还在一起”的“不变”列表
         }
     }
+    
 }
 
+//暂时废弃此类
+export class CollisionEvent{
 
- /**
+    
+    private relation:String;//in or out
+    private box0:ColiBox;
+    private box1:ColiBox;
+    private registrant0:any;
+    private registrant1:any;
+
+    constructor(boxes:[ColiBox, ColiBox]){
+        this.box0 = boxes[0];
+        this.box1 = boxes[1];
+        
+
+    }
+}
+
+/**
  * 这个类虽然叫质量效应，但它其实是一个物理类
  * 目前主营业务是碰撞检测
- * 是个单例
  * inst太难写了而且容易与init混淆，以后全部写成i
  */
 export default class MassEffect{
     private constructor(){}
+
     public static init(scene:Laya.Scene):void{
         this.i = new MassEffect();
         this.i.scene = scene;
         this.i.testLayer = new Laya.Sprite;
+        this.i.testLayer.pos(100,100);
         scene.addChild(this.i.testLayer);
         this.init = ()=>{};
     }
-    public static i:MassEffect;
-    public static Tags = {
-        ENEMY_BODY:"ENEMYBODY"
-    }
+    public static i:MassEffect;//单例
 
-
-    
     private coliBoxes:ColiBox[] = [];   //已注册的碰撞箱
     private oldPares:ColiPareList = new ColiPareList();  //上一次碰撞检测的结果
     
     private scene:Laya.Scene;       //游戏场景。实际上物理类不需要关注实体所在的场景，此属性仅供开发测试使用
     private testLayer:Laya.Sprite;  //专门用来测试的图层，不参与测试以外的功能
 
+    private neo:ColiBox;
+
     /**
      * 每一帧中所要做的事
-     * 1.更新所有碰撞箱的位置(这件事现在交给碰撞箱的创造者来做)
-     * 2.进行碰撞检测
+     * 1.进行碰撞检测
+     * 2.刷新“旧碰撞关系”
+     * 3.发布碰撞事件
      */
     public frameWork():void{
-        // let newList:ColiPareList = this._collisionDetect(this.coliBoxes);
-        // console.log(this.oldPares.findChange(newList));
+        let newList:ColiPareList = this._collisionDetect(this.coliBoxes);//进行碰撞检测
+        let result = this.oldPares.findChange(newList);//寻找变化的碰撞关系
+        this.oldPares = newList;//刷新“旧碰撞关系”
+        
+        result.in.foreach((ele)=>{
+            EventCentre.i.event(EventCentre.FieldName.Collision,"IN",ele);
+        });
+
+        result.out.foreach((ele)=>{
+            EventCentre.i.event(EventCentre.FieldName.Collision,"OUT",ele);
+        });
+
+        this.testLayer.graphics.clear();
+        this.coliBoxes.forEach((ele)=>{
+            MyMath.drawRec(this.testLayer,ele,"#444444")
+        });
+        result.in.foreach((ele)=>{
+            MyMath.drawRec(this.testLayer,ele[0],"#ff0000");
+            MyMath.drawRec(this.testLayer,ele[1],"#ff0000");
+        });
+        result.out.foreach((ele)=>{
+            MyMath.drawRec(this.testLayer,ele[0],"#0000ff");
+            MyMath.drawRec(this.testLayer,ele[1],"#0000ff");
+        });
+        this.neo.pos(this.testLayer.mouseX-50, this.testLayer.mouseY-50);
+        MyMath.drawRec(this.testLayer,this.neo,"#00ff00");
     }
 
+    /**
+     * 测试用方法
+     */
     public test():void{
-        let newList:ColiPareList;
-        let boxes:ColiBox[] = ColiBox.randomBoxes();
-        newList = this._collisionDetect(boxes);
-        // console.log(new fuck().you());
-        console.log(this.oldPares.findChange(newList).in);
-
-        // if (Math.random()>2) {
-        //     return;
-        // }
-        // let boxList:ColiBox[] = ColiBox.randomBoxes();
-        // boxList.forEach((ele)=>{
-        //     MyMath.drawRec(this.testLayer, ele, "#555555");
-        // });
-
-        // let tempLayer = new Laya.Sprite();
-        // this.testLayer.addChild(tempLayer);
-        // let result = this._collisionDetect(boxList);
-
-        // let index = 0;
-        // Laya.timer.loop(400, this, ()=>{
-        //     if (result.length === 0) {
-        //         return;
-        //     }
-        //     tempLayer.graphics.clear();
-        //     let pair = result[index];
-        //     MyMath.drawRec(tempLayer, pair[0], "#ff0000");
-        //     MyMath.drawRec(tempLayer, pair[1], "#00ff00");
-
-        //     index += 1;
-        //     if (index === result.length) {
-        //         index = 0;
-        //     }
-        // });
-
+        let e = ColiBox.randomBoxes();
+        for (let n = 0; n < 50; n += 1) {
+            this.coliBoxes.push(e[n]);
+        }
+        this.neo = e[0];
+        this.neo.size(100,100);
     }
 
-    
+    /**
+     * 注册碰撞箱
+     */
+    public signBox(registrant:any, type:string, x:number, y:number, width:number, height:number):void{
+        let box = new ColiBox(registrant);
+        box.pos(x,y);
+        box.size(width,height);
+        this.coliBoxes.push(box);
+    }
     
     
 
@@ -283,4 +337,38 @@ export default class MassEffect{
 
 
 
+}
+
+
+
+/**
+ * 储存代码
+ */
+function frameTest(){
+        //let m_x:number = this.testLayer.mouseX;
+        // let m_y:number = this.testLayer.mouseY;
+        // this.neo.pos(m_x-50,m_y-50).size(100,100);
+        // let newCollision = this._collisionDetect(this.coliBoxes);
+        // let result = this.oldPares.findChange(newCollision);
+        // //进入涂红，离开涂蓝，不变涂灰，neo涂绿
+        // this.testLayer.graphics.clear();
+        // for (let n = 0; n < result.remain.length; n += 1){
+        //     let pair:[ColiBox, ColiBox] = result.remain.read(n);
+        //     MyMath.drawRec(this.testLayer, pair[0], "#111111");
+        //     MyMath.drawRec(this.testLayer, pair[1], "#111111");
+        // }
+        // for (let n = 0; n < result.in.length; n += 1){
+        //     let pair:[ColiBox, ColiBox] = result.in.read(n);
+        //     MyMath.drawRec(this.testLayer, pair[0], "#ff0000");
+        //     MyMath.drawRec(this.testLayer, pair[1], "#ff0000");
+        // }
+        // for (let n = 0; n < result.out.length; n += 1){
+        //     let pair:[ColiBox, ColiBox] = result.out.read(n);
+        //     MyMath.drawRec(this.testLayer, pair[0], "#0000ff");
+        //     MyMath.drawRec(this.testLayer, pair[1], "#0000ff");
+        // }
+        
+        // console.log(`in:${result.in.length},out:${result.out.length},remain:${result.remain.length}`);
+        // MyMath.drawRec(this.testLayer, this.neo, "#00ff00");
+        // this.oldPares = newCollision;
 }

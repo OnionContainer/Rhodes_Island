@@ -18,7 +18,7 @@ export default class MyMath{
      * @param rec 矩形
      * @param color 颜色
      */
-    public static drawRec(spr:Laya.Sprite, rec:Laya.Rectangle, color:string):void{
+    public static drawRec(spr:Laya.Sprite, rec:Laya.Rectangle, color:string="#ffffff"):void{
         spr.graphics.drawRect(rec.x, rec.y, rec.width, rec.height, color, "#888888", 2);
     }
 

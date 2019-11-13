@@ -10,6 +10,9 @@ class FieldName{
     public get CreateEnemySprite():string{
         return "CreateEmemySprite";
     }
+    public get Collision():string{
+        return "Collision";
+    }
 }
 
 class TypeName{
@@ -19,9 +22,9 @@ class TypeName{
 }
 
 export default class EventCentre{
-    public static inst:EventCentre;//自身的实例
+    public static i:EventCentre;//自身的实例
     public static init():void{
-        EventCentre.inst = new EventCentre();
+        EventCentre.i = new EventCentre();
         this.init = ()=>{};
     }
     private constructor(){};

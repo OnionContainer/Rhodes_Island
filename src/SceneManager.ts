@@ -11,7 +11,7 @@ export default class SceneManager{
         
         Laya.Scene.open(this.loadingScene);
 
-        EventCentre.inst.once("Init", "Regular", this, ()=>{
+        EventCentre.i.once("Init", "Regular", this, ()=>{
             Laya.Scene.open(this.gameScene)
         })
     }

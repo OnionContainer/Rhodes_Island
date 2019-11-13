@@ -11,6 +11,6 @@ export default class Loading extends ui.LoadingSceneUI{
     }
 
     onLoaded(){
-        EventCentre.inst.event("Init", "Regular")
+        EventCentre.i.event("Init", "Regular")
     }
 }

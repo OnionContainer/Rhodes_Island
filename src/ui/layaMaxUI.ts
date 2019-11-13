@@ -25,4 +25,4 @@ export module ui {
         }
     }
     REG("ui.LoadingSceneUI",LoadingSceneUI);
-}
+}
