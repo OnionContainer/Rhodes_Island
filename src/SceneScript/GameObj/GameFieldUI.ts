@@ -31,7 +31,7 @@ class CentreField{
     private _width:number;
     private _height:number;
     constructor(scene:Laya.Scene){
-        const data:any = Database.inst.getGround();
+        const data:any = Database.i.getGround();
         const [width, height, size] = [data["width"], data["height"], data["size"]];
         this._size = size;
         this._width = width;
@@ -60,7 +60,7 @@ class CentreField{
     public CreateEnemy(imgURL:string,x:number = 0,y:number = 0):Laya.Sprite{
         let sprite:Laya.Sprite = Laya.Sprite.fromImage(imgURL);//创建sprite
         this._scene.getChildByName("UISet").addChild(sprite);//插入中心区域
-        sprite.size(Database.inst.UnitSize, Database.inst.UnitSize);//根据数据库提供的常量设置大小
+        sprite.size(Database.i.UnitSize, Database.i.UnitSize);//根据数据库提供的常量设置大小
         sprite.pos(x,y);//确定位置
         return sprite;
     }

@@ -17,10 +17,10 @@ type EnemyEvent = {
 export default class Database{
 
     //初始化 Start
-    public static inst:Database
+    public static i:Database
     //直接public static inst:Database = new Database(),是否可以在类装载时就创建所需的单例?
     public static init(){
-        this.inst = new Database()
+        this.i = new Database()
         this.init = ()=>{}
     }
     private constructor(){
@@ -60,5 +60,9 @@ export default class Database{
 
     public get UnitSize():number{
         return this.getGround().size;
+    }
+
+    public get subUnitSize():number{
+        return this.getGround().size - 2;
     }
 }

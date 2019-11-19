@@ -6,7 +6,7 @@ import { Struc } from "../../../Toybox/DataStructure";
 import Present from "./Present";
 import State from "./State";
 import MyMath from "../../../Toybox/myMath";
-import MassEffect from "../../../Toybox/MassEffect";
+import MassEffect, { ColiBox } from "../../../Toybox/MassEffect";
 
 /**
  * 敌人的表现类
@@ -24,16 +24,19 @@ class EnemyPst extends Present{
  * 敌人的状态类
  */
 class EnemyStt extends State{
-    private _path:Struc.PointerList<{x:number,y:number}>;
-    private _xSpeed:number;
-    private _ySpeed:number;
-    private _speed:number;
-    public out:boolean = false;
+    private _path:Struc.PointerList<{x:number,y:number}>;   //路径信息 敌人会按顺序直线走过路径标出的每一个点，pointer表示现在走到哪了
+    private _xSpeed:number;         //x轴速度
+    private _ySpeed:number;         //y轴速度
+    private _speed:number;          //总速度    总速度^2 = x轴速度^2 + y轴速度^2
+    public out:boolean = false;     //这个敌人是否还有下一个路径坐标
+    private _bodyBox:ColiBox;       //这是一个碰撞箱，代表敌人的身体                        
+
+
     constructor(data:any, pathID:string){
         super(data);
         //初始化路径
         this._path = new Struc.PointerList<{x:number,y:number}>();
-        let rawPath:number[][] = Database.inst.getPath(pathID);
+        let rawPath:number[][] = Database.i.getPath(pathID);
         rawPath.forEach((ele,index)=>{
             this._path.push({x:ele[0], y:ele[1]});
         });
@@ -45,6 +48,14 @@ class EnemyStt extends State{
         //初始化轴速度
         this._resetAxisSpeed();
 
+        //注册碰撞箱
+        this._bodyBox = MassEffect.i.signBox(this, "ENEMY_BODY");
+        let size = Database.i.subUnitSize;
+        this._bodyBox.pos(this._x, this._y).size(size, size);
+    }
+
+    public resetBodyPosition():void{
+        this._bodyBox.pos(this._x, this._y);
     }
 
     private _resetAxisSpeed():void{
@@ -93,7 +104,10 @@ class EnemyStt extends State{
     public get target():{x:number, y:number} {
         return this._path.next();
     }
-    
+
+    public get bodyBox():ColiBox{
+        return this._bodyBox;
+    }
 }
 
 /**
@@ -113,8 +127,8 @@ export default class Enemy extends People{
     constructor(id:string, pathID:string){
         super();
         //获取数据和路径
-        let data:any = Database.inst.getEnemy(id);
-        let path:any = Database.inst.getPath(pathID);
+        let data:any = Database.i.getEnemy(id);
+        let path:any = Database.i.getPath(pathID);
         this._data = data;
         this._path = new Struc.PointerList<number[]>(path);
 
@@ -122,9 +136,10 @@ export default class Enemy extends People{
         this._present = new EnemyPst(data["img"]);
         this._state = new EnemyStt(data, pathID);
 
-        //创建碰撞箱
         //设置监听事件
-
+        EventCentre.i.on(EventCentre.FieldName.Collision, "ENEMY_BODYA_ENEMY_BODYB_IN", this, (ele:[ColiBox, ColiBox])=>{
+            console.log("Enemy Found");
+        });
         console.log(this);
     }
 
@@ -148,6 +163,7 @@ export default class Enemy extends People{
         let newx:number = MyMath.moveTo(x,xSpeed,target.x);
         let newy:number = MyMath.moveTo(y,ySpeed,target.y);
         this._state.setPosition(newx,newy);
+        this._state.resetBodyPosition();
         //刷新位置
         this._present.perform(this._state);
     }

@@ -10,15 +10,21 @@ import EventCentre from "./EventCentre";
  */
 export class ColiBox extends Laya.Rectangle{
 
-    private registrant_:any;
+    private _registrant:any;
+    private _type:string;
 
     public get registrant():ColiBox{
-        return this.registrant_;
+        return this._registrant;
     }
 
-    constructor(register:any){
+    public get type():string{
+        return this._type;
+    }
+
+    constructor(register:any, type:string){
         super(0,0,0,0);
-        this.registrant_ = this.registrant_;
+        this._registrant = this._registrant;
+        this._type = type;
     }
 
     /**
@@ -32,7 +38,7 @@ export class ColiBox extends Laya.Rectangle{
         const rad:Function = MyMath.randomInt;
         let result:ColiBox[] = [];
         for(let i = 0; i < 50; i += 1) {
-            result.push(new ColiBox(null));
+            result.push(new ColiBox(null, "any"));
             result[i].pos(rad(xRange), rad(yRange)).size(rad(widRange), rad(higRange));
         }
         return result;
@@ -64,6 +70,13 @@ export class ColiBox extends Laya.Rectangle{
         }
         return  (this.y >= rec.y && this.y <= rec.bottom) ||
                 (this.bottom >= rec.y && this.bottom <= rec.bottom)
+    }
+}
+
+export class UnionBox extends ColiBox{
+    private ok:ColiBox = new ColiBox(1,"");
+    constructor(){
+        super(1,"2");
     }
 }
 
@@ -159,24 +172,6 @@ export class ColiPareList{
     
 }
 
-//暂时废弃此类
-export class CollisionEvent{
-
-    
-    private relation:String;//in or out
-    private box0:ColiBox;
-    private box1:ColiBox;
-    private registrant0:any;
-    private registrant1:any;
-
-    constructor(boxes:[ColiBox, ColiBox]){
-        this.box0 = boxes[0];
-        this.box1 = boxes[1];
-        
-
-    }
-}
-
 /**
  * 这个类虽然叫质量效应，但它其实是一个物理类
  * 目前主营业务是碰撞检测
@@ -215,49 +210,51 @@ export default class MassEffect{
         this.oldPares = newList;//刷新“旧碰撞关系”
         
         result.in.foreach((ele)=>{
-            EventCentre.i.event(EventCentre.FieldName.Collision,"IN",ele);
+            let name:string = [ele[0].type, ele[1].type].sort().join("_") + "_IN";
+            EventCentre.i.event(EventCentre.FieldName.Collision, name, ele);//type of ele: [ColiBox, ColiBox]
+            console.log(name);
         });
 
         result.out.foreach((ele)=>{
-            EventCentre.i.event(EventCentre.FieldName.Collision,"OUT",ele);
+            let name:string = [ele[0].type, ele[1].type].sort().join("_") + "_OUT";
+            EventCentre.i.event(EventCentre.FieldName.Collision, name, ele);
         });
 
-        this.testLayer.graphics.clear();
-        this.coliBoxes.forEach((ele)=>{
-            MyMath.drawRec(this.testLayer,ele,"#444444")
-        });
-        result.in.foreach((ele)=>{
-            MyMath.drawRec(this.testLayer,ele[0],"#ff0000");
-            MyMath.drawRec(this.testLayer,ele[1],"#ff0000");
-        });
-        result.out.foreach((ele)=>{
-            MyMath.drawRec(this.testLayer,ele[0],"#0000ff");
-            MyMath.drawRec(this.testLayer,ele[1],"#0000ff");
-        });
-        this.neo.pos(this.testLayer.mouseX-50, this.testLayer.mouseY-50);
-        MyMath.drawRec(this.testLayer,this.neo,"#00ff00");
+        // this.testLayer.graphics.clear();
+        // this.coliBoxes.forEach((ele)=>{
+        //     MyMath.drawRec(this.testLayer,ele,"#444444")
+        // });
+        // result.in.foreach((ele)=>{
+        //     MyMath.drawRec(this.testLayer,ele[0],"#ff0000");
+        //     MyMath.drawRec(this.testLayer,ele[1],"#ff0000");
+        // });
+        // result.out.foreach((ele)=>{
+        //     MyMath.drawRec(this.testLayer,ele[0],"#0000ff");
+        //     MyMath.drawRec(this.testLayer,ele[1],"#0000ff");
+        // });
+        // this.neo.pos(this.testLayer.mouseX-50, this.testLayer.mouseY-50);
+        // MyMath.drawRec(this.testLayer,this.neo,"#00ff00");
     }
 
     /**
      * 测试用方法
      */
     public test():void{
-        let e = ColiBox.randomBoxes();
-        for (let n = 0; n < 50; n += 1) {
-            this.coliBoxes.push(e[n]);
-        }
-        this.neo = e[0];
-        this.neo.size(100,100);
+        // let e = ColiBox.randomBoxes();
+        // for (let n = 0; n < 50; n += 1) {
+        //     this.coliBoxes.push(e[n]);
+        // }
+        // this.neo = e[0];
+        // this.neo.size(100,100);
     }
 
     /**
      * 注册碰撞箱
      */
-    public signBox(registrant:any, type:string, x:number, y:number, width:number, height:number):void{
-        let box = new ColiBox(registrant);
-        box.pos(x,y);
-        box.size(width,height);
+    public signBox(registrant:any, type:string):ColiBox{
+        let box = new ColiBox(registrant, type);
         this.coliBoxes.push(box);
+        return box;
     }
     
     

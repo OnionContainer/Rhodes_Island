@@ -1,4 +1,150 @@
+/**
+ * 虽然列向量和行向量都就是个定长数组
+ * 但我这里还是当列向量吧
+ */
+export class ColoumVector{
+    public static fromArray(arr:number[]):ColoumVector{
+        let result = new ColoumVector(arr.length);
+        arr.forEach((ele,index)=>{
+            result.write(index, ele);
+        });
 
+        return result;
+    }
+
+    public readonly height:number;
+    private _data:number[] = [];
+
+    constructor(height:number){
+        this.height = height;
+        
+        while(height > 0) {
+            this._data.push(0)
+            height -= 1;
+        }
+    }
+
+    //加减乘除没有减除
+    public plus(w:ColoumVector):ColoumVector{
+        if (w.height !== this.height) {
+            throw new DOMException("Not funny didn't laugh", "Not Funny Exception");
+        }
+
+        let result:ColoumVector = this.clone;
+        w._data.forEach((ele,index)=>{
+            result._data[index] += ele;
+        })
+        return result;
+    }
+
+    public multi(c:number):ColoumVector{
+        let result:ColoumVector = this.clone;
+        this._data.forEach((ele,index)=>{
+            result._data[index] = c*ele;
+        });
+        return result;
+    }
+
+
+    //增删改查没有增删
+    public write(index:number, value:number):void{
+        this._data[index] = value;
+    }
+
+    public read(index:number):number{
+        return this._data[index];
+    }
+
+    public cover(source:ColoumVector):void{
+        if (source.height !== this.height) {
+            throw new DOMException("Not funny didn't laugh", "Not Funny Exception");
+        }
+
+        source._data.forEach((ele,index)=>{
+            this._data[index] = ele;
+        });
+    }
+    
+    //其他函数
+    public print():ColoumVector{
+        console.log(this._data.join("\n"));
+        return this;
+    }
+
+    public get clone():ColoumVector{
+        let result:ColoumVector = new ColoumVector(this.height);
+        this._data.forEach((ele,index)=>{
+            result._data[index] = ele;
+        });
+        return result;
+    }
+}
+
+/**
+ * 虽然一排列向量和一列行向量都可以当矩阵
+ * 但这里是一排列向量
+ */
+export class Matrix{
+    public readonly height:number;
+    public readonly width:number;
+    private _data:ColoumVector[];
+    constructor(height:number, width:number){
+        this.height = height;
+        this.width = width;
+        this._data = [];
+        for (let n = 0; n < width; n += 1) {//零向量满上
+            this._data.push(new ColoumVector(height));
+        }
+    }
+    //增删改查没有增删
+    public writeColoum(index:number,coloum:ColoumVector):void{
+        this._data[index].cover(coloum);
+    }
+
+    public write(row:number, col:number, value:number):void{
+        if (row >= this.height || col >= this.width || row < 0 || col < 0) {
+            throw new DOMException("Not funny didn't laugh", "Not Funny Exception");
+        }
+        this._data[col].write(row, value);
+    }
+
+    public readColoum(index:number):ColoumVector{
+        return this._data[index];
+    }
+
+    public read(row:number, col:number):number{
+        return this._data[col].read(row);
+    }
+
+    //加减乘除没有减除
+    public transColVector(v:ColoumVector):ColoumVector{
+        if (v.height !== this.width) {
+            throw new DOMException("Not funny didn't laugh", "Not Funny Exception");
+        }
+
+        let result = new ColoumVector(this.height);
+        for (let col = 0; col < this.width; col += 1) {
+            result = result.plus(this._data[col].multi(v.read(col)));
+        }
+        return result;
+    }
+
+    //其他函数
+    public str():String{
+        let result:String = "";
+        for (let row = 0; row < this.height; row += 1) {
+            for (let col = 0; col < this.width; col += 1) {
+                result += this._data[col].read(row) + "\t";
+            }
+            result+="\n";
+        }
+        return result;
+    }
+
+    public print():void{
+        console.log(this.str());
+    }
+}
 
 export default class MyMath{
     //Laya模块

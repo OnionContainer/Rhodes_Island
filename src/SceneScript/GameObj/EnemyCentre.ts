@@ -14,7 +14,7 @@ export default class EnemyCentre{
         
         //Start
         //初始化时间轴
-        let timeData:any = Database.inst.getTimetable();
+        let timeData:any = Database.i.getTimetable();
         this._timetable = new Struc.PointerList<any>(timeData);
         //初始化时间轴
         //End
