@@ -5,7 +5,7 @@ import Loading from "./SceneScript/Loading"
 * 游戏初始化配置;
 */
 export default class GameConfig{
-    static width:number=1400;
+    static width:number=1800;
     static height:number=900;
     static scaleMode:string="noscale";
     static screenMode:string="none";

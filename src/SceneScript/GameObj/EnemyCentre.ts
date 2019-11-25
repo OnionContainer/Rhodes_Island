@@ -24,13 +24,16 @@ export default class EnemyCentre{
     private _timetable:Struc.PointerList<any>;
     
 
-    public frameWork(time:number):void{
+    public update(time:number):void{
         /*
         这个函数是EnemyCentre类每帧所做的事情
         time是此次游戏自游戏开始至这个函数运行之时已经经过的帧数
         在预期中，这个数值会从0开始，每帧+1
         */
-        if (!this._timetable.exceeding && time == this._timetable.read()["time"]) {
+
+        //2019/11/18
+        //下面这个判断条件的==改成了>=,还没测试过，记得测试
+        if (!this._timetable.exceeding && time >= this._timetable.read()["time"]) {
             //空值检查 && 当前时间与时间表上的时间一致
             let data:any = this._timetable.read();
             this.createEnemy(data["type"], data["path"]);
@@ -39,7 +42,7 @@ export default class EnemyCentre{
         
         
         this._enemyGroup.forEach(enemy=>{//每个Enemy挨个做事
-            enemy.frameWork();
+            enemy.update();
         });
     }
 

@@ -24,11 +24,17 @@ export default class Database{
         this.init = ()=>{}
     }
     private constructor(){
-        Laya.loader.load([enemyDatabase_URL,operatorDatabase_URL,gameSet_URL], Laya.Handler.create(this, ()=>{
-            this._enemyData = Laya.loader.getRes(enemyDatabase_URL)
-            this._operatorData = Laya.loader.getRes(operatorDatabase_URL)
-            this._gameSet = Laya.loader.getRes(gameSet_URL)
-        }))
+        Laya.loader.load([enemyDatabase_URL,operatorDatabase_URL,gameSet_URL], Laya.Handler.create(this, this.onLoaded));
+    }
+
+    private onLoaded():void{
+        this._enemyData = Laya.loader.getRes(enemyDatabase_URL);
+        this._operatorData = Laya.loader.getRes(operatorDatabase_URL);
+        this._gameSet = Laya.loader.getRes(gameSet_URL);
+
+        this._unitSize = this._gameSet["ground"].size;
+        this._subUnitSize = Math.floor(this._unitSize*4/5);
+
         console.log(this);
     }
     //初始化 End
@@ -36,6 +42,9 @@ export default class Database{
     private _enemyData:JSON;    //敌人数据json文件
     private _operatorData:JSON; //干员数据json文件
     private _gameSet:JSON;      //游戏设定json文件
+
+    private _unitSize:number;
+    private _subUnitSize:number;
     
 
     public getPath(pathName:string):number[][]{
@@ -59,10 +68,10 @@ export default class Database{
     }
 
     public get UnitSize():number{
-        return this.getGround().size;
+        return this._unitSize;
     }
 
     public get subUnitSize():number{
-        return this.getGround().size - 2;
+        return this._subUnitSize;
     }
 }

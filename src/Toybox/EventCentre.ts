@@ -1,18 +1,10 @@
 import { Struc } from "./DataStructure";
 
 class FieldName{
-    public get Global():string{
-        return "Global";
-    }
-    public get People():string{
-        return "People";
-    }
-    public get CreateEnemySprite():string{
-        return "CreateEmemySprite";
-    }
-    public get Collision():string{
-        return "Collision";
-    }
+    public readonly GLOBAL:string = "GLOBAL";
+    public readonly PEOPLE:string = "PEOPLE";
+    public readonly CREATE_ENEMY_SPRITE:string = "CREATE_ENEMY_SPRITE";
+    public readonly COLLISION:string = "COLLISION";
 }
 
 class TypeName{
@@ -56,6 +48,10 @@ export default class EventCentre{
             this._eventFields.set(field, new Laya.EventDispatcher());
         }
         this._eventFields.get(field).once(type, caller, method, args);
+    }
+
+    public off(field:string, type:string, caller:any, func:Function):void{//移除事件侦听器
+        this._eventFields.get(field).off(type, caller, func);
     }
 }
 

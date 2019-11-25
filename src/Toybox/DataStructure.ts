@@ -1,4 +1,60 @@
+import MyMath from "./myMath";
 
+export class Box extends Laya.Rectangle{
+    public unitX:number;
+    public unitY:number;
+
+    constructor(){
+        super(0,0,0,0);
+    }
+   
+
+    /**
+     * 就是……来一组（100个）随机的碰撞箱
+     * @param xRange 
+     * @param yRange 
+     * @param widRange 
+     * @param higRange
+     */
+    public static randomBoxes(xRange:number = 1200, yRange:number = 800, widRange:number = 300, higRange:number = 300):Box[]{
+        const rad:Function = MyMath.randomInt;
+        let result:Box[] = [];
+        for(let i = 0; i < 50; i += 1) {
+            result.push(new Box());
+            result[i].pos(rad(xRange), rad(yRange)).size(rad(widRange), rad(higRange));
+        }
+        return result;
+    }
+
+    public pos(x:number, y:number):Box{
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+
+    public size(width:number, height:number):Box{
+        this.width = width;
+        this.height = height;
+        return this;
+    }
+
+    public intersects_X(rec:Box):boolean{
+        if (this.x < rec.x) {
+            return rec.intersects_X(this);
+        }
+        return  (this.x >= rec.x && this.x <= rec.right) ||
+                (this.right >= rec.x && this.right <= rec.right)
+    }
+
+    public intersects_Y(rec:Box):boolean{
+        if (this.y<rec.y) {
+            return rec.intersects_Y(this);
+        }
+        return  (this.y >= rec.y && this.y <= rec.bottom) ||
+                (this.bottom >= rec.y && this.bottom <= rec.bottom)
+    }
+}
+    
 class MapNode<K,V>{
     public key;
     public value;
@@ -152,6 +208,23 @@ export module Struc{
                 }
             });
             return result;
+        }
+
+        /**
+         * 判断链表中是否存在某一元素
+         * @param item 
+         */
+        public has(item: E):boolean{
+
+            let current = this._head.next;
+            while (current != null) {
+                if (current.item == item) {
+                    return true;
+                }
+                current = current.next;
+            }
+
+            return false;
         }
 
         //高阶函数

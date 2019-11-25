@@ -6,10 +6,7 @@ var REG: Function = Laya.ClassUtils.regClass;
 export module ui {
     export class GameSceneUI extends Scene {
 		public UISet:Laya.Sprite;
-		public T1_1:Laya.Sprite;
-		public T2_2:Laya.Sprite;
-		public T3_1:Laya.Sprite;
-		public T2_1:Laya.Sprite;
+		public SideBar:Laya.Sprite;
         constructor(){ super()}
         createChildren():void {
             super.createChildren();
