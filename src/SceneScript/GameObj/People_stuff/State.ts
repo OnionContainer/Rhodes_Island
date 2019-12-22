@@ -5,4 +5,12 @@ export default abstract class State {
     constructor(data:any) {
         
     }
+
+    public get x():number{
+        return this._x;
+    }
+
+    public get y():number{
+        return this._y;
+    }
 }

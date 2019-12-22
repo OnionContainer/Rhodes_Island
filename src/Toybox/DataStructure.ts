@@ -1,8 +1,10 @@
 import MyMath from "./myMath";
 
 export class Box extends Laya.Rectangle{
+
     public unitX:number;
     public unitY:number;
+    
 
     constructor(){
         super(0,0,0,0);

@@ -102,6 +102,7 @@ export class Matrix{
     }
 
     public write(row:number, col:number, value:number):void{
+        // console.log(row +"|" + col);
         if (row >= this.height || col >= this.width || row < 0 || col < 0) {
             throw new DOMException("Not funny didn't laugh", "Not Funny Exception");
         }

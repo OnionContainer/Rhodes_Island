@@ -26,12 +26,20 @@
             [20,20],
             [20,200],
             [1090,600]
+        ],
+        "III":[
+            [0,0],
+            [1000,0],
+            [0,0],
+            [1000,0],
+            [0,0],
+            [1000,0]
         ]
     },
     "timetable":[
-        {"time": 0, "type": "bug0", "path":"I"},
-        {"time": 100, "type":"bug1","path":"II"}
+        {"time": 0, "type": "bug0", "path":"III"}
     ],
+    "comment":"reserved code:{\"time\": 100, \"type\":\"bug1\",\"path\":\"II\"}\"",
     "buff":{
         
     }

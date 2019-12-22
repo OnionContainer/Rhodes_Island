@@ -16,10 +16,12 @@ import OprtCentre from "./GameObj/OprtCentre";
 export default class Game extends ui.GameSceneUI{
     public static UISet:Laya.Sprite;
     public static stage:Laya.Stage;
-
+    private _pause:boolean = false;
 
     constructor(){
         super();
+
+        
         Game.UISet = this.UISet;
         Game.stage = this.stage;
 
@@ -40,6 +42,17 @@ export default class Game extends ui.GameSceneUI{
         // EventCentre.i.on(EventCentre.FieldName.Collision,"OUT",this,(ele:[ColiBox,ColiBox])=>{
         //     console.log("OUT detected");
         // })
+        EventCentre.i.on(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.PAUSE, this, ()=>{
+            if (this._pause) {
+                this._pause = false
+                Laya.timer.resume();
+            } else {
+                this._pause = true;
+                Laya.timer.pause();
+            }
+            
+        });
+
 
         Laya.timer.loop(17,this,this.frameWork);//开始帧循环
     }
@@ -49,7 +62,7 @@ export default class Game extends ui.GameSceneUI{
 
     public frameWork():void{
         
-        EnemyCentre.i.frameWork(this._time);
+        EnemyCentre.i.update(this._time);
         GameFieldUI.i.update();
         this._time += 1;
     }

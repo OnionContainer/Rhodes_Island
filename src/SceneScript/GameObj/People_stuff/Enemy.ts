@@ -16,9 +16,7 @@ class EnemyPst extends Present{
     constructor(url:string){
         super(url);
     }
-    public perform(state:EnemyStt):void{
-        this._sprite.pos(state.x,state.y);
-    }
+    
 }
 
 /**
@@ -29,7 +27,8 @@ class EnemyStt extends State{
     private _xSpeed:number;         //x轴速度
     private _ySpeed:number;         //y轴速度
     private _speed:number;          //总速度    总速度^2 = x轴速度^2 + y轴速度^2
-    public stop:boolean = false;     //这个敌人是否还有下一个路径坐标
+    public isOut:boolean = false;     //这个敌人是否还有下一个路径坐标
+    public isStop:boolean = false;     //这个敌人是否在移动
 
     private _bodyBox:Box;           //这是一个碰撞箱  
     public oldCollision:Box[] = [];      //这是上一次碰到的地图节点
@@ -56,12 +55,10 @@ class EnemyStt extends State{
         //注册碰撞箱
         this._bodyBox = new Box().size(size,size);
         this.resetBodyPosition();
-        console.log(this.bodyBox);
-        console.log(GameFieldUI.i.Centre.getRec(this._bodyBox));
     }
 
     public resetBodyPosition():void{
-        this._bodyBox.x = this._x + 1;
+        this._bodyBox.x = this._x + 1;//记得修改这个常数
         this._bodyBox.y = this._y + 1;
         // this._bodyBox.pos(this._x, this._y);
     }
@@ -97,12 +94,6 @@ class EnemyStt extends State{
         return (this._x === this._path.next().x) && (this._y === this._path.next().y);
     }
 
-    public get x():number{
-        return this._x;
-    }
-    public get y():number{
-        return this._y;
-    }
     public get xSpeed():number{
         return this._xSpeed;
     }
@@ -144,7 +135,12 @@ export default class Enemy extends People{
         this._state = new EnemyStt(data, pathID);
     }
 
-    public compareColiResult(previous:Box[], current:Box[]):{in:Box[], out:Box[]}{
+    /**
+     * 对比两次先后碰撞的结果，输出他们的差异
+     * @param previous 上一次的碰撞结果
+     * @param current 这一次的碰撞结果
+     */
+    private compareColiResult(previous:Box[], current:Box[]):{in:Box[], out:Box[]}{
         let inList:Box[] = [];
         let outList:Box[] = [];
 
@@ -178,10 +174,26 @@ export default class Enemy extends People{
 
     }
 
+    //供外部调用的方法集
+    public stop():void{
+        this._state.isStop = true;
+    }
+
+    public unstop():void{
+        this._state.isStop = false;
+    }
+
+    // public get UnitX():number{
+    //     return GameFieldUI.i.Centre.
+    // }
+
+
+
     public update():void{
-        if (this._state.stop) {
+        if (this._state.isOut || this._state.isStop) {
             return;
         }
+        
         //进行移动
         if (this._state.isArrived) {
             this._state.nextTarget();
@@ -189,7 +201,7 @@ export default class Enemy extends People{
         let {x,y,xSpeed,ySpeed,target} = this._state;
         
         if (target === undefined){
-            this._state.stop = true;
+            this._state.isOut = true;
             return;
         }
 
@@ -203,33 +215,24 @@ export default class Enemy extends People{
         this._present.perform(this._state);
         
         //碰撞检测
-        let result:Box[] = GameFieldUI.i.Centre.getRec(this._state.bodyBox);
-        let events = this.compareColiResult(this._state.oldCollision, result);
-        this._state.oldCollision = result;
+        let result:Box[] = GameFieldUI.i.Centre.collision(this._state.bodyBox);    //获取当前与自身有所重叠的所有方块
+        let events = this.compareColiResult(this._state.oldCollision, result);  //对比当前与上一帧的重叠方块异同
+        this._state.oldCollision = result;  //更新碰撞结果
 
         //发送事件
-        events.in.forEach((ele)=>{
-            const x:number = (ele.x-ele.x%Database.i.UnitSize)/Database.i.UnitSize;
-            const y:number = (ele.y-ele.y%Database.i.UnitSize)/Database.i.UnitSize;
-            EventCentre.i.event(EventCentre.FieldName.COLLISION, `IN${x+""+y}`, [this]);
+        events.in.forEach((ele)=>{//发布离开方格事件
+            // const unitX:number = (ele.x-ele.x%Database.i.UnitSize)/Database.i.UnitSize;
+            // const unitY:number = (ele.y-ele.y%Database.i.UnitSize)/Database.i.UnitSize;
+            // console.log(unitX === ele.unitX && unitY === ele.unitY);
+            // EventCentre.i.event(EventCentre.FieldName.COLLISION, `IN${unitY+""+unitX}`, [this]);
+            EventCentre.i.event(EventCentre.FieldName.COLLISION, `IN${ele.unitY+""+ele.unitX}`, [this]);
         });
 
-        events.out.forEach((ele)=>{
-            const x:number = (ele.x-ele.x%Database.i.UnitSize)/Database.i.UnitSize;
-            const y:number = (ele.y-ele.y%Database.i.UnitSize)/Database.i.UnitSize;
-            EventCentre.i.event(EventCentre.FieldName.COLLISION, `OUT${x+""+y}`, [this]);
+        events.out.forEach((ele)=>{//发布进入方格事件
+            // const unitX:number = (ele.x-ele.x%Database.i.UnitSize)/Database.i.UnitSize;
+            // const unitY:number = (ele.y-ele.y%Database.i.UnitSize)/Database.i.UnitSize;
+            // EventCentre.i.event(EventCentre.FieldName.COLLISION, `OUT${unitY+""+unitX}`, [this]);
+            EventCentre.i.event(EventCentre.FieldName.COLLISION, `OUT${ele.unitY+""+ele.unitX}`, [this]);
         });
-        
-
-        // Global.UISet_sub.graphics.clear();
-        // events.in.forEach((ele)=>{
-        //     // console.log(ele.unitY + "|" + ele.unitX);
-        //     MyMath.drawRec(Global.UISet_sub, ele, "#ff0000");
-        // });
-        // events.out.forEach((ele)=>{
-        //     MyMath.drawRec(Global.UISet_sub, ele, "#0000ff");
-        // });
-
-        // alert();
     }
 }

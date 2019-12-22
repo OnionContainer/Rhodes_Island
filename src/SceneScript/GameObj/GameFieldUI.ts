@@ -6,6 +6,7 @@ import People from "./People_stuff/People";
 import Global from "../../Toybox/Global";
 import Game from "../Game";
 import OprtCentre from "./OprtCentre";
+import Enemy from "./People_stuff/Enemy";
 
 
 /**
@@ -106,6 +107,7 @@ class SideField{
  */
 class CentreField{
     private _origin:Laya.Sprite;        //中央区域的原点
+    private _subLayer:Laya.Sprite = new Laya.Sprite();  //测试用图层
     private _blocks:Laya.Sprite[][];    //各个地图节点
      /*
     blocks是游戏界面包含的格子sprite集合
@@ -113,33 +115,35 @@ class CentreField{
     在取用block时，第一层数组的index值为横坐标，第二层数组的index值为纵坐标
     */
     private _recs:Box[][];              //各个地图节点对应的方格
+    private _enemyDistribution:Enemy[][][] = [];    //敌人所处的区域
     private _scene:Laya.Scene;          //场景
     private _size:number;               //格子大小（像素）               
     private _width:number;              //横向格子数量
     private _height:number;             //纵向格子数量
 
-    public range:Box;
+    public range:Box;                   //中心区域范围
 
     constructor(scene:Laya.Scene){
         //获取数据
         const data:any = Database.i.getGround();
-        const [width, height, size] = [data["width"], data["height"], data["size"]];
+        const [width, hight, size] = [data["width"], data["height"], data["size"]];
         this._size = size;
         this._width = width;
-        this._height = height;
+        this._height = hight;
         this._scene = scene;
         this._origin = scene.getChildByName("UISet") as Laya.Sprite;
+        this._origin.addChild(this._subLayer);
 
         //创建CentreField区域数据
         this.range = new Box();
-        this.range.size(width*size,height*size);
+        this.range.size(width*size,hight*size);
 
         //Start
         //创建地图方格 和对应的Box
 
         this._blocks = [];
         this._recs = [];
-        for (let y = 0; y < height; y += 1) {
+        for (let y = 0; y < hight; y += 1) {
             this._blocks[y] = [];
             this._recs[y] = [];
             for (let x = 0; x < width; x += 1) {
@@ -155,9 +159,75 @@ class CentreField{
         }
         //创建地图方格
         //End
+
+        //监控敌人位置
+        for (let row:number = 0; row < hight; row += 1) {
+            this._enemyDistribution[row] = [];
+            for (let col:number = 0; col < width; col += 1) {
+                console.log("run");
+                this._enemyDistribution[row][col] = [];
+                EventCentre.i.on(EventCentre.FieldName.COLLISION,
+                    EventCentre.TypeName.IN(row,col),
+                    this, this._onEnemyEntre, [row, col]);
+                EventCentre.i.on(EventCentre.FieldName.COLLISION,
+                    EventCentre.TypeName.OUT(row,col),
+                    this, this._onEnemyLeave, [row, col]);
+            }
+        }
+        console.log(this._enemyDistribution);
     }
 
-    public CreateEnemy(imgURL:string,x:number = 0,y:number = 0):Laya.Sprite{
+    /**
+     * 查看特定坐标中是否包含输入的enemy对象
+     */
+    public searchPoint(row:number, col:number, enemy:Enemy):boolean{
+        if (row < 0 || col < 0 || row >= this._height || col >= this._width ) {//超出边界直接false
+            return false;
+        }
+        let arr:Enemy[] = this._enemyDistribution[row][col];
+        for (let i = 0; i < arr.length; i += 1) {
+            if (arr[i] === enemy) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 将所有存在enemy的地图节点绘制为紫色
+     */
+    private _paint():void{
+        this._subLayer.graphics.clear();
+        this._enemyDistribution.forEach((row,y)=>{
+            row.forEach((ele,x)=>{
+                if (ele.length !== 0) {
+                    this._subLayer.graphics.drawRect(x*Database.i.UnitSize, y*Database.i.UnitSize,
+                    Database.i.UnitSize, Database.i.UnitSize, "#ff00ff");
+                }
+            });
+        });
+    }
+
+    private _onEnemyEntre(row:number, col:number, enemy:Enemy):void{
+        // console.log("Entre:" + row + "|" + col);
+        // console.log(this._enemyDistribution[row][col]);
+        this._enemyDistribution[row][col].push(enemy);
+        this._paint();
+    }
+
+    private _onEnemyLeave(row:number, col:number, enemy:Enemy):void{
+        // console.log("Leave:" + row + "|" + col);
+        let length = this._enemyDistribution[row][col].length;
+        for (let i = 0; i < length; i += 1) {
+            if (this._enemyDistribution[row][col][i] === enemy) {
+                this._enemyDistribution[row][col].splice(i,1);
+                break;
+            }
+        }
+        this._paint();
+    }
+
+    public CreateSprite(imgURL:string,x:number = 0,y:number = 0):Laya.Sprite{
         let sprite:Laya.Sprite = Laya.Sprite.fromImage(imgURL);//创建sprite
         this._scene.getChildByName("UISet").addChild(sprite);//插入中心区域
         sprite.size(Database.i.UnitSize, Database.i.UnitSize);//根据数据库提供的常量设置大小
@@ -169,7 +239,7 @@ class CentreField{
     /**
      * 输入一个方格，输出与其交叠的地图方格
      */
-    public getRec(from:Box):Box[] {
+    public collision(from:Box):Box[] {
         
         let origin_x = this.round(from.x,this._size);
         let origin_y = this.round(from.y,this._size);
@@ -243,6 +313,14 @@ export default class GameFieldUI{
         this._side = new SideField(scene, this.UISet.x + this._centre.range.width + 20);
         this._scene = scene;
         
+        //弄个暂停键凑合用
+        let pauseButton:Laya.Sprite = new Laya.Sprite();
+        pauseButton.size(50,50).pos(0,0);
+        pauseButton.graphics.drawRect(0,0,50,50,"#ff0000");
+        this._scene.addChild(pauseButton);
+        pauseButton.on(Laya.Event.MOUSE_DOWN, this, ()=>{
+            EventCentre.i.event(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.PAUSE);
+        });
         
 
         console.log(this);

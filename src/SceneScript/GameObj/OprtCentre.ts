@@ -12,11 +12,17 @@ export default class OprtCentre{
 
     private _oprtGroup:Oprt[] = [];
 
-    public createOprt(y:number, x:number, id:string){
-        console.log("New Operator at " + y + "_" + x);
+    public createOprt(unitY:number, unitX:number, id:string){
+        let oprt:Oprt = new Oprt(unitY, unitX, id);
+        this._oprtGroup.push(oprt);
+        console.log("New Operator at " + unitY + "_" + unitX);
     }
 
 
-
+    public update():void{
+        this._oprtGroup.forEach((ele)=>{
+            ele.update();
+        });
+    }
 
 }

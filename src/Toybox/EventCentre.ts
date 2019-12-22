@@ -11,6 +11,16 @@ class TypeName{
     public get Any():string{
         return "Any";
     }
+
+    //生成进入事件字符串
+    public IN(row:number, col:number):string{
+        return `IN${row+""+col}`;
+    }
+    public OUT(row:number, col:number):string{
+        return `OUT${row+""+col}`;
+    }
+
+    public readonly PAUSE:string = "PAUSE";
 }
 
 export default class EventCentre{
