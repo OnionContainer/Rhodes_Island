@@ -1,7 +1,12 @@
 {
     "bug0":{
         "name": "bug0",
-        "speed": 20,
+        "speed": 2,
         "img": "Basic/There-2.png"
+    },
+    "bug1":{
+        "name": "bug1",
+        "speed": 2,
+        "img": "Basic/OperatorSample_A.png"
     }
 }

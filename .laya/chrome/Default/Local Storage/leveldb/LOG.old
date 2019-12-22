@@ -1,3 +1,6 @@
-2019/08/09-11:59:43.203 1864 Reusing MANIFEST leveldb/MANIFEST-000001
-2019/08/09-11:59:43.205 1864 Recovering log #84
-2019/08/09-11:59:43.206 1864 Reusing old log leveldb/000084.log 
+2019/12/21-23:26:03.860 3a88 Reusing MANIFEST D:\LayaProjects\Rhodes_Hub\Rhodes_Island\.laya\chrome\Default\Local Storage\leveldb/MANIFEST-000001
+2019/12/21-23:26:03.860 3a88 Recovering log #607
+2019/12/21-23:26:03.861 3a88 Reusing old log D:\LayaProjects\Rhodes_Hub\Rhodes_Island\.laya\chrome\Default\Local Storage\leveldb/000607.log 
+2019/12/21-23:26:09.401 46dc Level-0 table #612: started
+2019/12/21-23:26:09.476 46dc Level-0 table #612: 10749 bytes OK
+2019/12/21-23:26:09.529 46dc Delete type=0 #607
