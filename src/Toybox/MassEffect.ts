@@ -219,13 +219,13 @@ export default class MassEffect{
         
         result.in.foreach((ele)=>{
             let name:string = [ele[0].type, ele[1].type].sort().join("_") + "_IN";
-            EventCentre.i.event(EventCentre.FieldName.COLLISION, name, ele);//type of ele: [ColiBox, ColiBox]
+            EventCentre.instance.event(EventCentre.FieldName.COLLISION, name, ele);//type of ele: [ColiBox, ColiBox]
             console.log(name);
         });
 
         result.out.foreach((ele)=>{
             let name:string = [ele[0].type, ele[1].type].sort().join("_") + "_OUT";
-            EventCentre.i.event(EventCentre.FieldName.COLLISION, name, ele);
+            EventCentre.instance.event(EventCentre.FieldName.COLLISION, name, ele);
         });
 
         // this.testLayer.graphics.clear();

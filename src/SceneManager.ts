@@ -11,7 +11,7 @@ export default class SceneManager{
         
         Laya.Scene.open(this.loadingScene);//打开加载场景
 
-        EventCentre.i.once("Init", "Regular", this, ()=>{//监听加载完毕事件
+        EventCentre.instance.once("Init", "Regular", this, ()=>{//监听加载完毕事件
             Laya.Scene.open(this.gameScene);
         });
     }

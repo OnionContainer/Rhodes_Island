@@ -3,6 +3,8 @@ import { Matrix } from "../../../Toybox/myMath";
 import Enemy from "./Enemy";
 import EventCentre from "../../../Toybox/EventCentre";
 import GameFieldUI from "../GameFieldUI";
+import Database from "../../../Toybox/Database";
+import Oprt from "./Oprt";
 
 export default abstract class People{
     public get UnitX():number{//需要在具体实现中重写
@@ -11,6 +13,16 @@ export default abstract class People{
     public get UnitY():number{//需要在具体实现中重写（那我为什么不弄个接口呢？
         return -1;
     }
+    public get NumX():number{
+        return -1;
+    }
+    public get NumY():number{
+        return -1;
+    }
+    public handleDamage(damage:Damage):void{//需要在具体实现中重写（感觉这玩意好像真是个接口……
+
+    };
+    
 
     constructor() {
         
@@ -23,10 +35,10 @@ export class Buff{
 }
 
 
-class DamageType{
-    public readonly PHYSICAL:string = "PHYSICAL";
-    public readonly MAGICAL:string = "MAGICAL";
-    public readonly CRITICAL:string = "CRITICAL";
+export class DamageType{
+    public static readonly PHYSICAL:string = "PHYSICAL";
+    public static readonly MAGICAL:string = "MAGICAL";
+    public static readonly CRITICAL:string = "CRITICAL";
 }
 
 /**
@@ -56,11 +68,111 @@ export class Damage{
 }
 
 /**
- * Weapon是一个储存攻击能力信息的类
+ * 由Weapon独有的一个数据类
+ * 存储前摇/后摇时间信息
+ * 帮助判断何时进行攻击
+ * 提供修改这些信息的API
+ */
+class ATKstage{
+    private _beforeATK:number = 10// 前摇时间/帧
+    
+    private _completeATK:number = 20// 攻击完成周期(前摇与后摇时间之和)/帧
+    
+    private _hadAttacked:boolean = false//在当前周期中已进行过攻击
+    private _stageATK:number = 0// 已经经历的攻击时间
+
+    public get beforeATK():number{
+        return this._beforeATK;
+    }
+
+    public get completeATK():number{
+        return this._completeATK;
+    }
+
+    public get stageATK():number{
+        return this._stageATK;
+    }
+
+    /**
+     * 
+     * @param before 设定前摇时间
+     * @param complete 设定攻击完成周期（前摇与后摇时间之和）
+     */
+    constructor(before:number, complete:number){
+        this._beforeATK = before;
+        this._completeATK = complete;
+    }
+
+    /**
+     * 记录一帧预备攻击状态
+     */
+    public update():void{
+        this._stageATK += 1;
+        if (this._stageATK > this._completeATK) {
+            this._stageATK = 0;//周期计数归零
+            this._hadAttacked = false;//重设攻击记录
+        }
+    }
+
+    /**
+     * 返回“已准备好进行攻击”的真值
+     */
+    public get atkReady():boolean{
+        return (this._stageATK >= this._beforeATK) && (!this._hadAttacked)//前摇阶段已结束，且此次循环中还未攻击过
+    }
+
+    /**
+     * 进行攻击
+     * 将“此次循环中已攻击过”设为真
+     * 每次进行攻击时必须调用此函数
+     */
+    public attackRecord():void{
+        this._hadAttacked = true;
+    }
+
+    /**
+     * 重置攻击状态
+     */
+    public reset():void{
+        this._stageATK = 0;
+        this._hadAttacked = false;
+    }
+}
+
+
+/**
+ * EnemyWeapon是一个储存敌人攻击能力信息的类
+ * 这些Weapon类等重构之后都得重写……
+ * 
+ */
+export class EnemyWeapon{
+    private _power:number = 3;
+    private _target:Oprt;
+    public stage:ATKstage = new ATKstage(60,180);
+    constructor(){
+
+    }
+    
+    public count(oprt:Oprt):void{
+        if (oprt === this._target) {
+            this.stage.update();
+            if (this.stage.atkReady) {
+                this.stage.attackRecord();
+                oprt.handleDamage(new Damage(this._power, null, DamageType.PHYSICAL));
+            }
+        } else {
+            this.stage.reset();
+            this._target = oprt;
+        }
+    }
+}
+
+/**
+ * Weapon是一个储存干员攻击能力信息的类
  */
 export class Weapon{
     private _size:number;           //攻击范围大小
-    private _matrix:Matrix;         //攻击范围标识矩阵
+    public _matrix:Matrix;         //攻击范围标识矩阵
     private _originX:number = 0;    //x轴中心点
     private _originY:number = 0;    //y轴中心点
     private _centre:number = 0;   //矩阵中心坐标
@@ -69,7 +181,15 @@ export class Weapon{
 
     private _blockList:Enemy[] = [];//正在阻挡的敌人
     private _captureList:Enemy[] = [];  //攻击范围中的敌人
+    public get captureList():Enemy[]{
+        return this._captureList;
+    }
+    
+    public power:number = 22;//攻击力
 
+    public stage:ATKstage;
+
+    
 
     /**
      * 创建一个weapon
@@ -111,6 +231,69 @@ export class Weapon{
         this._matrix.write(this._centre,this._centre+2,1);
         
         this._resetEvent();
+
+        this.stage = new ATKstage(50,120);
+    }
+
+    public rotateClock():Weapon{
+        this._clearEvent();
+        this._matrix = this._matrix.rotateClock();
+        this._resetEvent();
+        return this;
+    }
+
+    /**
+     * [[x,y], [x,y], [x,y]]
+     */
+    public getIndexLocations():number[][]{
+        let result:number[][] = [];
+        const xStart = this._shiftX;
+        const yStart = this._shiftY;
+
+        for (let row = 0; row < this._size; row += 1) {
+            for (let col = 0; col < this._size; col += 1) {
+                if (this._matrix.read(row, col) === 1) {
+                    result.push([xStart + col, yStart + row]);
+                }
+            }
+        }
+
+
+        return result;
+    }
+
+    /**
+     * 开炮！
+     * 目前attack会对处于攻击范围内的所有敌人进行攻击
+     * 伤害数值就是weapon的power数值
+     * 更多选择目标逻辑和伤害类型、buff加成将在后续版本实现
+     * 此方法应由一个Oprt实例调用
+     */
+    public attack():void{
+
+        const blockLength:number = Database.i.UnitSize;
+        let twelve:Function = ():number=>{
+            return Math.random()*24 - 12;
+        };
+        this._captureList.forEach((ele)=>{
+            
+            let damage:Damage = new Damage(this.power, null, DamageType.PHYSICAL);
+            ele.handleDamage(damage);
+            // GameFieldUI.i.Centre.attackEffect(
+            //     (this._originX)*blockLength + blockLength/2 + twelve(),
+            //     (this._originY)*blockLength + blockLength/2 + twelve(),
+            //     ele.NumX + twelve() + blockLength/2,
+            //     ele.NumY + twelve() + blockLength/2
+            // )
+
+            EventCentre.instance.event(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.EFFECT,
+            [ele.NumX, ele.NumY, `#99ccff`]);
+        });
+        this.stage.attackRecord();
+    
+        // const shift:number = (this._size-1)/2;
+        
+        
     }
 
     /**
@@ -123,26 +306,31 @@ export class Weapon{
             for (let col:number = 0; col < this._matrix.width; col += 1) {
                 if (this._matrix.read(row, col) === 1) {
                     //为矩阵上每一个值为1的点设置监听事件
-                    EventCentre.i.on(EventCentre.FieldName.COLLISION,
+                    EventCentre.instance.on(EventCentre.FieldName.COLLISION,
                         EventCentre.TypeName.IN(row + this._shiftY, col + this._shiftX),
                         this, this._onEnemyEntre);
-                    EventCentre.i.on(EventCentre.FieldName.COLLISION,
+                    EventCentre.instance.on(EventCentre.FieldName.COLLISION,
                         EventCentre.TypeName.OUT(row + this._shiftY, col + this._shiftX),
                         this, this._onEnemyLeave);
                 }
             }
         }
+    }
 
-        // for (let row:number = 0; row < this._matrix.height; row += 1) {
-        //     for (let col:number = 0; col < this._matrix.width; col += 1) {
-        //         if (this._matrix.read(row, col) === 1) {
-        //             //为矩阵上每一个值为1的点设置监听事件
-        //             EventCentre.i.on(EventCentre.FieldName.COLLISION,
-        //             EventCentre.TypeName.OUT(row + this._shiftY, col + this._shiftX),
-        //             this, this._onEnemyLeave);
-        //         }
-        //     }
-        // }
+    private _clearEvent():void{
+        for (let row:number = 0; row < this._matrix.height; row += 1) {
+            for (let col:number = 0; col < this._matrix.width; col += 1) {
+                if (this._matrix.read(row, col) === 1) {
+                    //为矩阵上每一个值为1的点设置监听事件
+                    EventCentre.instance.off(EventCentre.FieldName.COLLISION,
+                        EventCentre.TypeName.IN(row + this._shiftY, col + this._shiftX),
+                        this, this._onEnemyEntre);
+                    EventCentre.instance.off(EventCentre.FieldName.COLLISION,
+                        EventCentre.TypeName.OUT(row + this._shiftY, col + this._shiftX),
+                        this, this._onEnemyLeave);
+                }
+            }
+        }
     }
 
     private _onEnemyEntre(enemy:Enemy):void{
@@ -165,11 +353,11 @@ export class Weapon{
                 console.log
                 let positionStatus:number = this._matrix.read(row,col);
                 if (positionStatus !== 0) {
-                    console.log((this._shiftY + row)+"|"+ (this._shiftX + col));
+                    // console.log((this._shiftY + row)+"|"+ (this._shiftX + col));
                     // console.log(GameFieldUI.i.Centre.searchPoint(this._shiftY + row, this._shiftX + col, enemy));
                     found = GameFieldUI.i.Centre.searchPoint(this._shiftY + row, this._shiftX + col, enemy);
                     if (found) {
-                        console.log("Enemy remove failed")
+                        // console.log("Enemy remove failed")
                         return;
                     }
                 }
@@ -178,8 +366,8 @@ export class Weapon{
         //如果未查找到该敌人（函数未return），将此敌人从捕捉列表中移除
         for (let i:number = 0; i < this._captureList.length; i += 1) {
             if (this._captureList[i] === enemy) {
-                console.log("Enemy removed");
-                console.log(this._captureList.splice(i,1));
+                // console.log("Enemy removed");
+                this._captureList.splice(i,1);
             }
         }
         

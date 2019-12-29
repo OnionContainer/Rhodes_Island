@@ -130,6 +130,20 @@ export class Matrix{
         return result;
     }
 
+    //旋转
+    public rotateClock():Matrix{
+        let result:Matrix = new Matrix(this.width, this.height);
+        for (let down = 0; down < result.height; down += 1) {
+            
+            for (let right = 0; right < result.width; right += 1) {
+                const from:number = this.read(this.height-1-right, down);
+                result.write(down, right, from);
+            }
+        }
+
+        return result;
+    }
+
     //其他函数
     public str():String{
         let result:String = "";

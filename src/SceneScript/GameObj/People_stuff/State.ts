@@ -2,6 +2,8 @@
 export default abstract class State {
     protected _x:number;
     protected _y:number;
+    public health:number;
+    public fullHealth:number;
     constructor(data:any) {
         
     }

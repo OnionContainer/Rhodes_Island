@@ -1,4 +1,4 @@
-import People from "./People";
+import People, { Damage, Weapon, EnemyWeapon, DamageType } from "./People";
 import Database from "../../../Toybox/Database";
 import EventCentre from "../../../Toybox/EventCentre";
 import GameFieldUI from "../GameFieldUI";
@@ -7,14 +7,16 @@ import Present from "./Present";
 import State from "./State";
 import MyMath from "../../../Toybox/myMath";
 import MassEffect, { ColiBox } from "../../../Toybox/MassEffect";
-import Global from "../../../Toybox/Global";
+import MyGlobal from "../../../Toybox/Global";
+import Oprt from "./Oprt";
+import Doctor from "../Doctor";
 
 /**
  * 敌人的表现类
  */
 class EnemyPst extends Present{
     constructor(url:string){
-        super(url);
+        super(url, true);
     }
     
 }
@@ -32,6 +34,10 @@ class EnemyStt extends State{
 
     private _bodyBox:Box;           //这是一个碰撞箱  
     public oldCollision:Box[] = [];      //这是上一次碰到的地图节点
+
+    public weapon:EnemyWeapon = new EnemyWeapon();
+
+    
 
 
     constructor(data:any, pathID:string){
@@ -51,6 +57,9 @@ class EnemyStt extends State{
         this._speed = data["speed"];
         //初始化轴速度
         this._resetAxisSpeed();
+        //初始化基础属性
+        this.health = data['HP']; //血量
+        this.fullHealth = this.health;
 
         //注册碰撞箱
         this._bodyBox = new Box().size(size,size);
@@ -117,6 +126,12 @@ export default class Enemy extends People{
     private _present:EnemyPst;
     private _state:EnemyStt;
 
+    public tryAttack(oprt:Oprt):void{
+        this._state.weapon.count(oprt);
+        let stage = this._state.weapon.stage;
+        this._present.drawActionBar(stage.stageATK, stage.beforeATK, stage.completeATK);
+    }
+
     /**
      * 
      * @param id 敌人id，用于获取敌人数据
@@ -132,7 +147,47 @@ export default class Enemy extends People{
 
         //创建表现类和数据类
         this._present = new EnemyPst(data["img"]);
+        this._present.relatedPeople = this;
         this._state = new EnemyStt(data, pathID);
+
+        //初始化动作条
+        this._present.drawActionBar(0,1,2);
+
+        console.log(this);
+    }
+
+    /**
+     * 对传入的伤害进行处理
+     * @param damage 
+     */
+    
+    public handleDamage(damage:Damage):void{
+        this._state.health -= damage.value;
+        this._present.drawHealthBar(this._state.health,this._state.fullHealth);
+        if (this._state.health <= 0) {
+            this._dead();
+        }
+    }
+
+    /**
+     * 这个函数真是乱到一定程度了……
+     */
+    public clearActionBar():void{
+        this._present.drawActionBar(0,1,2);
+    }
+
+    /**
+     * 死亡函数
+     */
+    private _dead():void{
+        this.update = ()=>{
+            console.log("invalid update");
+        };
+        this._present.hide();
+        EventCentre.instance.event(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.ENEMY_DEAD, [this]);
+        this._state.oldCollision.forEach((ele)=>{
+            EventCentre.instance.event(EventCentre.FieldName.COLLISION, EventCentre.TypeName.OUT(ele.unitY, ele.unitX), [this]);
+        });
     }
 
     /**
@@ -174,6 +229,14 @@ export default class Enemy extends People{
 
     }
 
+    public get NumX():number{
+        return this._state.x;
+    };
+
+    public get NumY():number{
+        return this._state.y;
+    }
+
     //供外部调用的方法集
     public stop():void{
         this._state.isStop = true;
@@ -202,6 +265,8 @@ export default class Enemy extends People{
         
         if (target === undefined){
             this._state.isOut = true;
+            this.handleDamage(new Damage(114514, this, DamageType.PHYSICAL));
+            Doctor.instance.damage();
             return;
         }
 
@@ -225,14 +290,14 @@ export default class Enemy extends People{
             // const unitY:number = (ele.y-ele.y%Database.i.UnitSize)/Database.i.UnitSize;
             // console.log(unitX === ele.unitX && unitY === ele.unitY);
             // EventCentre.i.event(EventCentre.FieldName.COLLISION, `IN${unitY+""+unitX}`, [this]);
-            EventCentre.i.event(EventCentre.FieldName.COLLISION, `IN${ele.unitY+""+ele.unitX}`, [this]);
+            EventCentre.instance.event(EventCentre.FieldName.COLLISION, `IN${ele.unitY+""+ele.unitX}`, [this]);
         });
 
         events.out.forEach((ele)=>{//发布进入方格事件
             // const unitX:number = (ele.x-ele.x%Database.i.UnitSize)/Database.i.UnitSize;
             // const unitY:number = (ele.y-ele.y%Database.i.UnitSize)/Database.i.UnitSize;
             // EventCentre.i.event(EventCentre.FieldName.COLLISION, `OUT${unitY+""+unitX}`, [this]);
-            EventCentre.i.event(EventCentre.FieldName.COLLISION, `OUT${ele.unitY+""+ele.unitX}`, [this]);
+            EventCentre.instance.event(EventCentre.FieldName.COLLISION, `OUT${ele.unitY+""+ele.unitX}`, [this]);
         });
     }
 }

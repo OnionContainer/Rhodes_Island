@@ -2,12 +2,22 @@ import Database from "../../Toybox/Database";
 import EventCentre from "../../Toybox/EventCentre";
 import { Struc, Box } from "../../Toybox/DataStructure";
 import MyMath from "../../Toybox/myMath";
-import People from "./People_stuff/People";
-import Global from "../../Toybox/Global";
+import People, { Weapon } from "./People_stuff/People";
+import MyGlobal from "../../Toybox/Global";
 import Game from "../Game";
 import OprtCentre from "./OprtCentre";
 import Enemy from "./People_stuff/Enemy";
+import Oprt from "./People_stuff/Oprt";
+import Present from "./People_stuff/Present";
 
+class TempPst extends Present{
+    constructor(){
+        super(null);
+    }
+    public removeHealthBar():void{
+        this._sprite.graphics.clear();
+    }
+}
 
 /**
  * 干员栏的一个单元
@@ -33,12 +43,25 @@ class OprtProfile{
     private onMouseDown():void{
         let spr:Laya.Sprite = Laya.Sprite.fromImage(this.img);//创建并调整拖动图标
         spr.size(Database.i.UnitSize, Database.i.UnitSize);
+        
+        //绘制方块
+        
+        let pst:TempPst = new TempPst();
+        pst.removeHealthBar();
+    
+        // let weapon:Weapon = new Weapon(2,0,5);
+        // pst.drawAttackRange(weapon);
+        //绘制方块
+
+
         GameFieldUI.i.UISet.addChild(spr);
-        Laya.timer.loop(20, this, this.onLoop, [spr, GameFieldUI.i.Centre.range]);//拖动图标开始跟随鼠标
-        this.sprite.stage.once(Laya.Event.MOUSE_UP, this, this.onMouseUp, [spr, GameFieldUI.i.Centre.range]);//监听鼠标抬起事件
+
+
+        Laya.timer.loop(20, this, this.onLoop, [spr, GameFieldUI.i.Centre.range, pst]);//拖动图标开始跟随鼠标
+        this.sprite.stage.once(Laya.Event.MOUSE_UP, this, this.onMouseUp, [spr, GameFieldUI.i.Centre.range, pst]);//监听鼠标抬起事件
     }
 
-    private onLoop(spr:Laya.Sprite, range:Box):void{
+    private onLoop(spr:Laya.Sprite, range:Box, pst:TempPst):void{
         let x:number = Game.UISet.mouseX;
         let y:number = Game.UISet.mouseY;
         if ((x>0 && x<range.right) && (y>0&&y<range.bottom)) {
@@ -46,21 +69,65 @@ class OprtProfile{
             x = x-x%size;
             y = y-y%size;
             spr.pos(x, y);
+            pst.clearAttackRange();
+            pst.drawAttackRange(new Weapon(Math.floor(y/size),Math.floor(x/size),5));
             return;
         }
         spr.pos(x - spr.width/2, y - spr.height/2);
     }
 
-    private onMouseUp(spr:Laya.Sprite, range:Box):void{
+    private onMouseUp(spr:Laya.Sprite, range:Box, pst:TempPst):void{
         Laya.timer.clear(this, this.onLoop);//停止跟随循环
-        spr.destroy();//消除拖动图标
+        
         let x:number = Game.UISet.mouseX;
         let y:number = Game.UISet.mouseY;
         if ((x>0 && x<range.right) && (y>0&&y<range.bottom)) {//鼠标处于地图范围内
+            
+
             let size:number = Database.i.UnitSize;
             x = (x-x%size)/size;//计算单位位置
             y = (y-y%size)/size;
-            OprtCentre.i.createOprt(y, x, this.id);
+
+            const xMan:number = x*size;
+            const yEs:number = y*size;
+
+            //Looooooooooooooooooooooooooooooop
+            let dirNum:number = 0;
+            let direct:Function = ()=>{
+                let currentX = Game.UISet.mouseX;
+                let currentY = Game.UISet.mouseY;
+                if (currentX > xMan && currentY > yEs && currentY < yEs + size) {
+                    console.log("right");
+                    dirNum = 0;
+                    pst.clearAttackRange();
+                    pst.drawAttackRange(new Weapon(y,x,5));
+                } else if (currentX < xMan && currentY > yEs && currentY < yEs + size) {
+                    console.log("left");
+                    dirNum = 2;
+                    pst.clearAttackRange();
+                    pst.drawAttackRange(new Weapon(y,x,5).rotateClock().rotateClock());
+                } else if (currentY < yEs && currentX > xMan && currentX < xMan + size) {
+                    console.log("up");
+                    dirNum = 3;
+                    pst.clearAttackRange();
+                    pst.drawAttackRange(new Weapon(y,x,5).rotateClock().rotateClock().rotateClock());
+                } else if (currentY > yEs && currentX > xMan && currentX < xMan + size) {
+                    console.log("down");
+                    dirNum = 1;
+                    pst.clearAttackRange();
+                    pst.drawAttackRange(new Weapon(y,x,5).rotateClock());
+                }
+            };
+
+
+            Laya.timer.loop(20, this, direct);
+            Laya.stage.once(Laya.Event.MOUSE_DOWN, this, ()=>{
+                pst.clearAttackRange()
+                Laya.timer.clear(this, direct);
+                OprtCentre.i.createOprt(y, x, this.id, dirNum);
+                spr.destroy();//消除拖动图标
+            });
+            
         } else {//鼠标处于地图范围外
             //其实没什么要做的
         }
@@ -88,7 +155,7 @@ class SideField{
         //绘制方框
         this._origin.graphics.drawRect(0,0,100,500,"#fa1566");
         //根据可选干员列表生成待选干员栏
-        let list:string[] = Global.ListOfOprt;//Global.ListOfOprt仅在开发时采用，后续将会通过制定标准规定干员列表的来源
+        let list:string[] = MyGlobal.ListOfOprt;//Global.ListOfOprt仅在开发时采用，后续将会通过制定标准规定干员列表的来源
 
         list.forEach((ele, index)=>{
             let currentOprt = new OprtProfile(ele);
@@ -108,6 +175,7 @@ class SideField{
 class CentreField{
     private _origin:Laya.Sprite;        //中央区域的原点
     private _subLayer:Laya.Sprite = new Laya.Sprite();  //测试用图层
+    private _topLayer:Laya.Sprite = new Laya.Sprite();  //上层图层
     private _blocks:Laya.Sprite[][];    //各个地图节点
      /*
     blocks是游戏界面包含的格子sprite集合
@@ -134,6 +202,10 @@ class CentreField{
         this._origin = scene.getChildByName("UISet") as Laya.Sprite;
         this._origin.addChild(this._subLayer);
 
+        this._origin.parent.addChild(this._topLayer);
+        this._topLayer.pos(this._origin.x,this._origin.y);
+        this._topLayer.zOrder = 100;
+        
         //创建CentreField区域数据
         this.range = new Box();
         this.range.size(width*size,hight*size);
@@ -147,7 +219,9 @@ class CentreField{
             this._blocks[y] = [];
             this._recs[y] = [];
             for (let x = 0; x < width; x += 1) {
-                let block:Laya.Sprite = Laya.Sprite.fromImage("Basic/Rec.png");
+                console.log(Database.i.getGround());
+                let pngNum:number = Database.i.getGround()["matrix"][y][x];
+                let block:Laya.Sprite = Laya.Sprite.fromImage(`Basic/${pngNum}.png`);
                 this._origin.addChild(block);
                 block.size(size,size).pos(x*size,y*size);
                 this._blocks[y][x] = block;
@@ -166,15 +240,94 @@ class CentreField{
             for (let col:number = 0; col < width; col += 1) {
                 console.log("run");
                 this._enemyDistribution[row][col] = [];
-                EventCentre.i.on(EventCentre.FieldName.COLLISION,
+                EventCentre.instance.on(EventCentre.FieldName.COLLISION,
                     EventCentre.TypeName.IN(row,col),
                     this, this._onEnemyEntre, [row, col]);
-                EventCentre.i.on(EventCentre.FieldName.COLLISION,
+                EventCentre.instance.on(EventCentre.FieldName.COLLISION,
                     EventCentre.TypeName.OUT(row,col),
                     this, this._onEnemyLeave, [row, col]);
             }
         }
         console.log(this._enemyDistribution);
+
+        EventCentre.instance.on(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.EFFECT, this, this.onAttackOccur);
+        EventCentre.instance.event(EventCentre.FieldName.GLOBAL,
+            EventCentre.TypeName.EFFECT,
+            [500,500,"2"]
+        )
+    }
+
+    /**
+     * 此函数仅在29日重构前使用
+     */
+    public attackEffect(fromX:number, fromY:number, toX:number, toY:number):void{
+        let sprite:Laya.Sprite = new Laya.Sprite();
+        this._topLayer.addChild(sprite);
+        sprite.zOrder = 10000;
+        
+        sprite.graphics.drawRect(fromX,fromY,10,10,"#ff0000");
+        let count:number = 0;
+        let max:number = 30;
+        
+        let func:Function = ()=>{
+            sprite.graphics.drawRect(fromX + (toX-fromX)*count/max, fromY + (toY-fromY)*count/max, 5, 5, "#ff0040");
+            count += 1;
+            if (count <= max) {
+                Laya.timer.once(10,this,func);
+            } else {
+                sprite.graphics.drawRect(toX,toY,10,10,"#ff0040");
+                Laya.timer.once(1500,this,()=>{
+                    this._topLayer.removeChild(sprite);
+                });
+            }
+        };
+        func();
+        
+    }
+
+    /**
+     * 这个也只在demo里使用
+     */
+    public onAttackOccur(x:number, y:number, color:string):void{
+        x += Math.random()*20 - 10;
+        y += Math.random()*20 - 10;
+
+        let spr:Laya.Sprite = new Laya.Sprite;
+        this._topLayer.addChild(spr);
+
+        let time:number = 0;
+        let scale:number = 0.7;
+        const size:number = Database.i.UnitSize;
+        let scaleIncreaseRate:number = 0.4;
+        let scaleIncreaseRateIncreaseRate:number = -0.06;
+
+        let ok:Function = ()=>{
+            const currentSize:number = size*scale;
+            const locate:number = (size-currentSize)/2;
+
+            // console.log(color);
+
+            spr.graphics.clear();
+            spr.graphics.drawRect(x + locate, y + locate, currentSize, 4, color);
+            spr.graphics.drawRect(x + locate, y + locate, 4, currentSize, color);
+            spr.graphics.drawRect(x + locate + currentSize, y + locate, 4, currentSize, color);
+            spr.graphics.drawRect(x + locate, y + locate + currentSize, currentSize, 4, color);
+
+
+            scale = scale + scaleIncreaseRate;
+            scaleIncreaseRate = Math.max(0.01, scaleIncreaseRate + scaleIncreaseRateIncreaseRate);
+            time += 1;
+
+            if (time < 20) {
+                Laya.timer.once(20, this, ok);
+            } else {
+                spr.parent.removeChild(spr);
+            }
+        }
+
+        ok();
+
+
     }
 
     /**
@@ -197,6 +350,10 @@ class CentreField{
      * 将所有存在enemy的地图节点绘制为紫色
      */
     private _paint():void{
+        if (!MyGlobal.LINE_EFFECT_ON) {
+            return;
+        }
+
         this._subLayer.graphics.clear();
         this._enemyDistribution.forEach((row,y)=>{
             row.forEach((ele,x)=>{
@@ -319,7 +476,7 @@ export default class GameFieldUI{
         pauseButton.graphics.drawRect(0,0,50,50,"#ff0000");
         this._scene.addChild(pauseButton);
         pauseButton.on(Laya.Event.MOUSE_DOWN, this, ()=>{
-            EventCentre.i.event(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.PAUSE);
+            EventCentre.instance.event(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.PAUSE);
         });
         
 

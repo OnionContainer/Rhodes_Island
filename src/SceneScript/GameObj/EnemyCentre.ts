@@ -1,6 +1,7 @@
 import Enemy from "./People_stuff/Enemy";
 import { Struc } from "../../Toybox/DataStructure";
 import Database from "../../Toybox/Database";
+import EventCentre from "../../Toybox/EventCentre";
 
 
 export default class EnemyCentre{
@@ -18,6 +19,8 @@ export default class EnemyCentre{
         this._timetable = new Struc.PointerList<any>(timeData);
         //初始化时间轴
         //End
+
+        EventCentre.instance.on(EventCentre.FieldName.GLOBAL, EventCentre.TypeName.ENEMY_DEAD, this, this.onEnemyDead);
     }
 
     private _enemyGroup:Enemy[];
@@ -44,6 +47,15 @@ export default class EnemyCentre{
         this._enemyGroup.forEach(enemy=>{//每个Enemy挨个做事
             enemy.update();
         });
+    }
+
+    private onEnemyDead(enemy:Enemy):void{
+        for (let i = 0; i < this._enemyGroup.length; i += 1) {
+            if (this._enemyGroup[i] === enemy) {
+                this._enemyGroup.splice(i,1);
+                break;
+            }
+        }
     }
 
     public createEnemy(enemyID:string, pathID:string):void{

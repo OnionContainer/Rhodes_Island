@@ -7,6 +7,7 @@ class FieldName{
     public readonly COLLISION:string = "COLLISION";
 }
 
+
 class TypeName{
     public get Any():string{
         return "Any";
@@ -21,14 +22,21 @@ class TypeName{
     }
 
     public readonly PAUSE:string = "PAUSE";
+    public readonly ENEMY_DEAD:string = "ENEMY_DEAD";
+    public readonly EFFECT:string = "EFFECT";
+    public readonly OPRT_DEAD:string = "OPRT_DEAD";
+    public readonly SHOW_RANGE:string = "SHOW_RANGE";
+    public readonly HIDE_RANGE:string = "HIDE_RANGE";
 }
 
 export default class EventCentre{
-    public static i:EventCentre;//自身的实例
+    public static instance:EventCentre;//自身的实例
+
     public static init():void{
-        EventCentre.i = new EventCentre();
+        EventCentre.instance = new EventCentre();
         this.init = ()=>{};
     }
+
     private constructor(){};
 
     private _eventFields:Struc.Map<string, Laya.EventDispatcher> = new Struc.Map<string, Laya.EventDispatcher>();

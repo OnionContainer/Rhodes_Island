@@ -1,0 +1,15 @@
+{
+    "bird":{
+        "HP": 50,
+        "ATK": 20,
+        "img": "Basic/doge.png",
+        "small": "Basic/dogesmall.png"
+    },
+    "sb":{
+        "HP": 102,
+        "ATK": 1,
+        "img": "Basic/OperatorSample_A.png"
+    }
+
+
+}
