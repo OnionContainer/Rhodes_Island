@@ -29,6 +29,7 @@ export default abstract class People{
     }
 }
 
+
 export class Buff{
     private permanent:boolean;
     private countDown:number;
