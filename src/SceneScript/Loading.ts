@@ -1,5 +1,4 @@
 import {ui} from "../ui/layaMaxUI"
-import EventCentre from "../Toybox/EventCentre";
 
 export default class Loading extends ui.LoadingSceneUI{
     constructor(){
@@ -13,6 +12,5 @@ export default class Loading extends ui.LoadingSceneUI{
     }
 
     onLoaded(){
-        EventCentre.instance.event("Init", "Regular");
     }
 }
