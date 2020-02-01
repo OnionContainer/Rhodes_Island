@@ -3,13 +3,21 @@ import EnemyMgr from "./Managers/EnemyMgr";
 import { Vec2, MyMath } from "../OneFileModules/MyMath";
 import Actor from "./Managers/Actor/Actor";
 import { EventCentre } from "../OneFileModules/EventCentre";
-import { GridSpace, ColiMatrix } from "./Managers/Actor/ActorModules/ColiMessage";
+import { ColiEmit, ColiReceiver } from "./Managers/Actor/ActorModules/ColiMessage";
 import { Enemy } from "./Managers/Actor/Enemy";
+import { ArrayAlgo } from "../OneFileModules/DataStructure";
 
-class Joey extends Actor{
 
-}
 
+
+
+
+/**
+ * 这是游戏本体
+ * 包含：
+ * 敌人对象管理中心
+ * 干员对象管理中心
+ */
 export default class RhodesGame{
 
     private oprtMgr:OprtMgr;
@@ -20,25 +28,13 @@ export default class RhodesGame{
 
 
         //init stage
-
         
         this.oprtMgr = new OprtMgr();
         this.enemyMgr = new EnemyMgr();
 
-        Laya.timer.loop(20, this, this.update);
+        // Laya.timer.loop(20, this, this.update);
 
         //test 
-        // let a = new GridSpace(10,10);
-        // console.log(()=>{
-        //     a.pos(400,400);
-        //     a.event(new Enemy(), Actor.Identity.ACTOR);
-        //     a.pos(10,10);
-        //     a.event(new Enemy(), Actor.Identity.ACTOR);
-        // });
-
-        // let b = new ColiMatrix(10,10);
-        // console.log(b);
-        // console.log(Actor.Identity, new Vec2(0,0));
     }
 
     public update():void{

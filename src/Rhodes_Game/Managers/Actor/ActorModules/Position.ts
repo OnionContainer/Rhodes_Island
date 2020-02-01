@@ -13,12 +13,20 @@ export class Pos{
     private _arrived:boolean = false;//已到达目的地(每次设置新目的地时设为false)
     public get arrived():boolean{return this._arrived;}//获取是否已到达的信息
 
+    /**
+     * 设置目的地并重设分量速度
+     * @param target 
+     */
     public setTarget(target:Vec2):void{
         
         this.target = target;
         this.aim();
     }
 
+    /**
+     * 设置直线速度并重设分量速度
+     * @param speed 
+     */
     public setSpeed(speed:number):void{
         this.speed = speed;
         this.aim();
@@ -26,6 +34,7 @@ export class Pos{
 
     /**
      * 计算移动参数,并将_arrived设为false
+     * 将会重设分量速度和逼近次数
      */
     private aim():void{
         this.vecSpeed = MyMath.moveToComponent(this.data,this.target,this.speed);

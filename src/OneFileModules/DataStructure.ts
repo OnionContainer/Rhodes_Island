@@ -298,6 +298,12 @@ export class ArrayAlgo{
         //求交集a∩b
     }
 
+    /**
+     * 求ele在arr中的index，若未找到则返回-1
+     * ele必须实现comparable接口
+     * @param ele 
+     * @param arr 
+     */
     public static findEle(ele:Comparable, arr:Comparable[]):number{
         for (let i = 0; i < arr.length; i += 1) {
             if (ele.equals(arr[i])) {
@@ -307,6 +313,12 @@ export class ArrayAlgo{
         return -1;
     }
 
+    /**
+     * 从arr中移除ele
+     * 如果ele不存在则什么都不做
+     * @param ele 
+     * @param arr 
+     */
     public static removeEle(ele:any, arr:any[]):any[]{
         const i = arr.indexOf(ele);
         if (i !== -1) {
