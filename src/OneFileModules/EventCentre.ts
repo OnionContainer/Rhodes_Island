@@ -1,5 +1,5 @@
 import { Vec2 } from "./MyMath";
-
+//////
 export class EventCentre{
     public static instance:EventCentre;
     public static EType:EType;

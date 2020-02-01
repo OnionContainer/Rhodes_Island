@@ -126,7 +126,7 @@ export abstract class ColiReceiver{
     protected onEntre(actor:Actor, position:Vec2):void{
 
     }
-
+////
     /**
      * 此方法提供给此类的子类重写
      * 每当此实例监控的进入碰撞事件在已启用监听的坐标发生时，此函数将被调用
