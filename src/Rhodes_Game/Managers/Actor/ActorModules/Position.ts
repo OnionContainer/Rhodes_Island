@@ -6,6 +6,9 @@ import { Vec2, MyMath } from "../../../../OneFileModules/MyMath";
 export class Pos{
     // public autoSwitchTarget:boolean = true;
     public data:Vec2 = new Vec2(0,0);//位置
+
+
+    
     public target:Vec2 = new Vec2(0,0);//目标
     public speed:number = 0;//速度
     public approach:number = 0;//逼近次数

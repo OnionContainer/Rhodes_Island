@@ -1,5 +1,15 @@
 import { Comparable } from "./MyMath";
 
+export class KVPair<K,V>{
+    private _list:any = {};
+    public edit(key:K, value:V):void{
+        this._list[key] = value;
+    }
+    public read(key:K):V{
+        return this._list[key];
+    }
+}
+
 
 class Node<E>{
     public item:E;

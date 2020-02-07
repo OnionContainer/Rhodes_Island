@@ -102,6 +102,15 @@ export class Vec2 implements Comparable{
     }
 
     /**
+     * 以输入坐标为中心进行顺时针90度旋转
+     * （未完成）
+     * @param centre 
+     */
+    public rotateClockwise(centre:Vec2):Vec2{
+        return this;
+    }
+
+    /**
      * 返回此向量的复制
      */
     public clone():Vec2{

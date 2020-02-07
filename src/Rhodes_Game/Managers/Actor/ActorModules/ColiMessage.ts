@@ -144,6 +144,7 @@ export abstract class ColiReceiver{
      */
     public setDetection(position:Vec2, identity:string):void{
         if (this.detectionExist(position)) {//如果在此处已存在监控，则取消监控
+            console.log("setDetection函数不能在同一个坐标多次监控，请查看ColiReciever类");
             return;
         }
         if (position.x >= this._width || position.x < 0 ||
