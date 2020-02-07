@@ -7,7 +7,7 @@ export default class Oprt extends Actor{
 
     constructor(){
         super();
-        this.state = new OprtStateMachine(new EnemySeeker(10,10, Vec2.listFromList(
+        this.state = new OprtStateMachine(new EnemySeeker(10,10, Vec2.listFromList(//需求数据库
             [
                 [0,0],
                 [1,0],

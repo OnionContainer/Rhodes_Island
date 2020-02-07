@@ -3,7 +3,7 @@ import { Vec2 } from "../../OneFileModules/MyMath";
 import Actor from "./Actor/Actor";
 import { EventCentre } from "../../OneFileModules/EventCentre";
 import { ArrayAlgo } from "../../OneFileModules/DataStructure";
-import { ColiReceiver } from "./Actor/ActorModules/ColiMessage";
+import { ColiReceiver, ColiEmit } from "./Actor/ActorModules/ColiMessage";
 import Path from "./Path";
     
 
@@ -61,7 +61,21 @@ class PathInfo{
     }
 }
 
+class TheBestRendererEver{
+    private _sprite:Laya.Sprite = new Laya.Sprite();
+    constructor(){
+        Laya.stage.addChild(this._sprite);
+        this._sprite.zOrder = 10;
+    }
 
+    public render(enemyList:Enemy[]):void{
+        this._sprite.graphics.clear();
+        enemyList.forEach(ele=>{
+            this._sprite.graphics.drawRect(ele.pos.data.x, ele.pos.data.y,
+                 ColiEmit.GLOBAL_UNIT_SUBWIDTH, ColiEmit.GLOBAL_UNIT_SUBHEIGHT, "#00ffff", "#00ff00", 2);
+        });
+    }
+}
 
 /**
  * 敌人对象管理中心
@@ -69,8 +83,8 @@ class PathInfo{
  */
 export default class EnemyMgr{
     
-    private pathInfo:PathInfo = new PathInfo();
-    private _testLayer:Laya.Sprite;//一个测试用的图层，不重要
+    private pathInfo:PathInfo = new PathInfo();//把这个东西改成键值对数据结构
+    private renderer:TheBestRendererEver = new TheBestRendererEver();//测试用模块
 
     private enemyOnStage:Enemy[] = [];//已经处于战场上的敌人
     private enemyOffStage:Enemy[] = [];//进入战场前的敌人
@@ -92,7 +106,6 @@ export default class EnemyMgr{
         );
 
         
-        this._testLayer = Laya.stage.addChild(new Laya.Sprite()) as Laya.Sprite;
 
         let e = new Enemy();
         e.pos.setSpeed(5);
@@ -106,7 +119,7 @@ export default class EnemyMgr{
 
     public update():void{
         this.moveAllEnemy();//移动所有的enemy
-        this.test();
+        this.renderer.render(this.enemyOnStage);
     }
 
     /**
@@ -154,12 +167,6 @@ export default class EnemyMgr{
         }
     }
 
-    private test():void{
-        this._testLayer.graphics.clear();
-        this.enemyOnStage.forEach(ele=>{
-            this._testLayer.graphics.drawRect(ele.pos.data.x, ele.pos.data.y, 10, 10, "#ff0000");
-        });
-    }
 }
 
 

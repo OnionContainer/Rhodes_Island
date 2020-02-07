@@ -123,19 +123,15 @@ export abstract class ColiReceiver{
      * @param actor 
      * @param position
      */
-    protected onEntre(actor:Actor, position:Vec2):void{
+    protected abstract onEntre(actor:Actor, position:Vec2):void
 
-    }
-////
     /**
      * 此方法提供给此类的子类重写
      * 每当此实例监控的进入碰撞事件在已启用监听的坐标发生时，此函数将被调用
      * @param actor 
      * @param position
      */
-    protected onLeave(actor:Actor, position:Vec2):void{
-
-    }
+    protected abstract onLeave(actor:Actor, position:Vec2):void
 
     /**
      * 在指定坐标上设置监听碰撞事件
@@ -158,7 +154,7 @@ export abstract class ColiReceiver{
         //设置监听事件
             detector[0] = (actor:Actor)=>{//进入事件函数
                 this.onEntre(actor, position);
-            };
+            }
             detector[1] = (actor:Actor)=>{//离开事件函数
                 this.onLeave(actor, position);
             }

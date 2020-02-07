@@ -41,8 +41,12 @@ class ColiReporter extends ColiReceiver{
     public render():void{
         this.layer.graphics.clear();
         this.inList.forEach(ele=>{
-            this.layer.graphics.drawRect(ele.x*ColiEmit.GLOBAL_UNIT_WIDTH, ele.y*ColiEmit.GLOBAL_UNIT_HEIGHT,
-            ColiEmit.GLOBAL_UNIT_WIDTH, ColiEmit.GLOBAL_UNIT_HEIGHT, "#ff0000");
+            this.layer.graphics.drawRect(ele.x*ColiEmit.GLOBAL_UNIT_WIDTH + 1,
+                ele.y*ColiEmit.GLOBAL_UNIT_HEIGHT + 1,
+                ColiEmit.GLOBAL_UNIT_WIDTH - 2,
+                ColiEmit.GLOBAL_UNIT_HEIGHT - 2,
+                "#ff0000"
+            );
         });
     }
 }
@@ -59,6 +63,7 @@ export default class RhodesGame{
 
     private oprtMgr:OprtMgr;
     private enemyMgr:EnemyMgr;
+
 
     private reporter;
 
@@ -78,6 +83,7 @@ export default class RhodesGame{
 
     public update():void{
         this.enemyMgr.update();
+        this.oprtMgr.update();
     }
 }
 

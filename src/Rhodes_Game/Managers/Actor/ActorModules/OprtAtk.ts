@@ -24,6 +24,7 @@ class Wait implements State{
     }
 
     public execute(machine:OprtStateMachine, seeker:EnemySeeker, oprt:Oprt):void{
+        
         if (seeker.captureList.length !== 0) {//如果能够找到敌人
             let prepare:Prepare = machine.stateList.read(StateType.PREPARE) as Prepare;
             prepare.reset();
@@ -31,8 +32,9 @@ class Wait implements State{
             prepare.focus = seeker.captureList[0];//设定prepare阶段所瞄准的敌人
             seeker.focus = prepare.focus;//设定seeker“额外关注”的敌人
             machine.curState = prepare;//切换状态机的当前状态
+            console.log("Found Enemy, Switch to prepare phase @"+ this.time);
         } else {//如果找不到敌人
-            this.time = 0;
+            this.time += 1;
         }
         //如果seeker中存在敌人，reset Prepare并跳转到Prepare阶段
     }
@@ -60,7 +62,7 @@ class Prepare implements State{
         if (this.focus === seeker.focus) {//focus 一致
             this.time += 1;
             if (this.time >= oprt.profile.PrepTime) {
-                console.log("Attack");//进行攻击
+                console.log("Attack & to After Phase @" + this.time);//进行攻击
                 //进入后摇状态
                 let after:After_Atk = machine.stateList.read(StateType.AFTER_ATK) as After_Atk;
                 after.reset();
@@ -68,12 +70,14 @@ class Prepare implements State{
             }
         } else {//focus 不一致
             if (seeker.captureList.length !== 0) {//找到新目标
+                console.log("Reset Prepare Phase @" + this.time);
                 //重设前摇状态
                 this.reset();
                 //寻找合适的enemy
                 this.focus = seeker.captureList[0];
                 seeker.focus = this.focus;
             } else {//未找到目标
+                console.log("Target Lost @" + this.time);
                 //进入等待状态
                 let wait:Wait = machine.stateList.read(StateType.WAIT) as Wait;
                 wait.reset();
@@ -93,6 +97,7 @@ class After_Atk implements State{
     public execute(machine:OprtStateMachine, seeker:EnemySeeker, oprt:Oprt):void{
         this.time += 1;//单纯计个数，满了就返回wait状态
         if (this.time >= oprt.profile.AfterTime) {
+            console.log("Wait After ATK End, to Wait @"+this.time);
             let wait:Wait = machine.stateList.read(StateType.WAIT) as Wait;
             wait.reset();
             machine.curState = wait;
@@ -141,7 +146,7 @@ export class EnemySeeker extends ColiReceiver{
     这个表就是记录他进入了多少次，然后每离开一次就-1
     当他发布离开事件且表里记录他只进入过1次的时候，就1-1=0，把它放走
     */
-    public captureList:Enemy[];//然后这个就是用来记录监控区域里所有enemy的数组
+    public captureList:Enemy[] = [];//然后这个就是用来记录监控区域里所有enemy的数组
 
     //这注释真的大坨
 
