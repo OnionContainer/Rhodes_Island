@@ -4,6 +4,7 @@ import Actor from "./Actor/Actor";
 import { EventCentre } from "../../OneFileModules/EventCentre";
 import { ArrayAlgo } from "../../OneFileModules/DataStructure";
 import { ColiReceiver } from "./Actor/ActorModules/ColiMessage";
+import Path from "./Path";
     
 
 class EnemyMatrix extends ColiReceiver{
@@ -46,41 +47,61 @@ class EnemyMatrix extends ColiReceiver{
     }
 }
 
+class PathInfo{
+    private _collection:any = {};
+    constructor(){}
+    public add(name:string, path:Vec2[]):boolean{
+        if (this._collection[name] !== undefined) {//this path is already defined
+            return false;
+        }
+        this._collection[name] = path;
+    }
+    public read(name:string):Vec2[]{
+        return this._collection[name];
+    }
+}
+
+
+
 /**
  * 敌人对象管理中心
  * 
  */
 export default class EnemyMgr{
     
-    private pathGroup:Vec2[][] = [//路径信息
-        //每一局游戏可能存在多种供敌人途经的路径。这些路径信息在初始化后存在这里
-        Vec2.listFromList([
-            [500,500],
-            [39,558],
-            [0,0],
-            [300,400]
-        ]),
-    ];
+    private pathInfo:PathInfo = new PathInfo();
     private _testLayer:Laya.Sprite;//一个测试用的图层，不重要
 
     private enemyOnStage:Enemy[] = [];//已经处于战场上的敌人
     private enemyOffStage:Enemy[] = [];//进入战场前的敌人
     private enemyDeadZone:Enemy[] = [];//已死亡的敌人
 
-    private _matrix:EnemyMatrix;
+    public matrix:EnemyMatrix;
 
     constructor(){
+        this.pathInfo.add("default", 
+            Vec2.listFromList([
+                [500,500],
+                [39,558],
+                [0,0],
+                [300,400],
+                [900,900],
+                [900,0],
+                [400,114]
+            ])
+        );
+
         
         this._testLayer = Laya.stage.addChild(new Laya.Sprite()) as Laya.Sprite;
 
         let e = new Enemy();
         e.pos.setSpeed(5);
-        this.enemyToStage(e,this.pathGroup[0]);
+        this.enemyToStage(e,this.pathInfo.read("default"));
         console.log(e);
 
         //上面这些都不重要
 
-        this._matrix = new EnemyMatrix(10,10);//这里应该是两个从数据库中得到的数字
+        this.matrix = new EnemyMatrix(10,10);//这里应该是两个从数据库中得到的数字
     }
 
     public update():void{
@@ -106,6 +127,16 @@ export default class EnemyMgr{
      * 发布移动事件
      */
     private moveAllEnemy():void{
+
+        let enemy = this.enemyOnStage[0];
+        enemy.pos.setTarget(new Vec2(Laya.stage.mouseX, Laya.stage.mouseY));
+        enemy.pos.move();
+        enemy.grid.pos(enemy.pos.data.x, enemy.pos.data.y);
+        enemy.grid.event(enemy, Actor.Identity.ENEMY);
+
+        if (Math.random()<10) {
+            return;
+        }
         for (let enemy of this.enemyOnStage) {
             if (enemy.pos.arrived) {
                 enemy.pathSegCount += 1;
@@ -116,6 +147,8 @@ export default class EnemyMgr{
                 enemy.pos.setTarget(enemy.correspondedPath[enemy.pathSegCount]);
             }
             enemy.pos.move();
+
+            
             enemy.grid.pos(enemy.pos.data.x, enemy.pos.data.y);
             enemy.grid.event(enemy, Actor.Identity.ENEMY);
         }

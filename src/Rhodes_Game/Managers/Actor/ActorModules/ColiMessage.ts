@@ -126,7 +126,7 @@ export abstract class ColiReceiver{
     protected onEntre(actor:Actor, position:Vec2):void{
 
     }
-
+////
     /**
      * 此方法提供给此类的子类重写
      * 每当此实例监控的进入碰撞事件在已启用监听的坐标发生时，此函数将被调用
@@ -144,6 +144,7 @@ export abstract class ColiReceiver{
      */
     public setDetection(position:Vec2, identity:string):void{
         if (this.detectionExist(position)) {//如果在此处已存在监控，则取消监控
+            console.log("setDetection函数不能在同一个坐标多次监控，请查看ColiReciever类");
             return;
         }
         if (position.x >= this._width || position.x < 0 ||
