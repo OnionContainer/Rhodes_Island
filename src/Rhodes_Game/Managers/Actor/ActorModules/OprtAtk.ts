@@ -4,6 +4,16 @@ import Oprt from "../Oprt";
 import { Enemy } from "../Enemy";
 import { Vec2 } from "../../../../OneFileModules/MyMath";
 import Actor from "../Actor";
+import { EventCentre } from "../../../../OneFileModules/EventCentre";
+import { Buff } from "./Buff";
+import { Damage } from "./Damage";
+
+class Brave extends Buff{
+    public launchDamage(damage:Damage):Damage{
+        damage.numIncrement += 10;
+        return damage;
+    }
+}
 
 enum StateType{
     WAIT = "WAIT",
@@ -12,7 +22,7 @@ enum StateType{
 }
 
 interface State{
-    execute(machine:OprtStateMachine, seeker:EnemySeeker, oprt:Oprt):void
+    execute(machine:OprtATK_SM, seeker:EnemySeeker, oprt:Oprt):void
     reset():void
 }
 
@@ -23,7 +33,7 @@ class Wait implements State{
         this.time = 0;
     }
 
-    public execute(machine:OprtStateMachine, seeker:EnemySeeker, oprt:Oprt):void{
+    public execute(machine:OprtATK_SM, seeker:EnemySeeker, oprt:Oprt):void{
         
         if (seeker.captureList.length !== 0) {//如果能够找到敌人
             let prepare:Prepare = machine.stateList.read(StateType.PREPARE) as Prepare;
@@ -49,7 +59,8 @@ class Prepare implements State{
         this.focus = null;
     }
 
-    public execute(machine:OprtStateMachine, seeker:EnemySeeker, oprt:Oprt):void{
+    
+    public execute(machine:OprtATK_SM, seeker:EnemySeeker, oprt:Oprt):void{
         //如果focus一致
             //增添1计数
             //如果计数已满
@@ -61,8 +72,11 @@ class Prepare implements State{
                 //跳转到Wait阶段
         if (this.focus === seeker.focus) {//focus 一致
             this.time += 1;
-            if (this.time >= oprt.profile.PrepTime) {
+            if (this.time >= oprt.profile.prepTime) {
                 console.log("Attack & to After Phase @" + this.time);//进行攻击
+                EventCentre.instance.event(EventCentre.EType.ATTACK, [oprt, this.focus]);
+                oprt.buffList.push(new Brave());
+                ////////进行攻击补充攻击函数！
                 //进入后摇状态
                 let after:After_Atk = machine.stateList.read(StateType.AFTER_ATK) as After_Atk;
                 after.reset();
@@ -94,9 +108,9 @@ class After_Atk implements State{
         this.time = 0;
     }
 
-    public execute(machine:OprtStateMachine, seeker:EnemySeeker, oprt:Oprt):void{
+    public execute(machine:OprtATK_SM, seeker:EnemySeeker, oprt:Oprt):void{
         this.time += 1;//单纯计个数，满了就返回wait状态
-        if (this.time >= oprt.profile.AfterTime) {
+        if (this.time >= oprt.profile.afterTime) {
             console.log("Wait After ATK End, to Wait @"+this.time);
             let wait:Wait = machine.stateList.read(StateType.WAIT) as Wait;
             wait.reset();
@@ -105,9 +119,23 @@ class After_Atk implements State{
     }
 }
 
-export class OprtStateMachine{
+/**
+ * Oprt状态机类
+ * sm是State Machine 的意思
+ */
+export class OprtATK_SM{
+    /**
+     * 当前状态
+     */
     public curState:State;
-    public stateList:KVPair<StateType, State> = new KVPair<StateType, State>();
+    /**
+     * 状态表
+     * 一般由状态实例修改，虽然是public但不应开放给其他对象
+     */
+    public stateList:KVPair<State> = new KVPair<State>();
+    /**
+     * 这里面可以查找该单位当前锁定的敌人
+     */
     public seeker:EnemySeeker;
     constructor(seeker:EnemySeeker){
         this.seeker = seeker;
@@ -115,6 +143,7 @@ export class OprtStateMachine{
         this.stateList.edit(StateType.WAIT, this.curState);
         this.stateList.edit(StateType.PREPARE, new Prepare());
         this.stateList.edit(StateType.AFTER_ATK, new After_Atk());
+        
     }
 
     public execute(oprt:Oprt):void{
@@ -135,13 +164,13 @@ export class EnemySeeker extends ColiReceiver{
     */
 
     private _range:Vec2[];//所有受监控的坐标
-    private _countList:KVPair<number, number> = new KVPair<number, number>();//记录每一个Enemy的进入次数
+    private _countList:KVPair<number> = new KVPair<number>();//记录每一个Enemy的进入次数
     /*
     这个countList的逻辑是这样
     因为我们可能一次性监控好几个格子，一个敌人有可能处于好几个我们监控的格子内
     此时如果看到他发的离开事件就把他放掉，有可能就不对
     他可能还在某个别的我们监控中的格子里
-    （可能讲得比较抽象，考虑画画图看看，或者来找我，我是群主）
+    （可能讲得比较抽象，可以考虑画个图看，或者来找我，我是群主）
     所以我们就要记这个enemy在我们监控的地方发布了多少次进入事件，发布了多少次离开事件
     这个表就是记录他进入了多少次，然后每离开一次就-1
     当他发布离开事件且表里记录他只进入过1次的时候，就1-1=0，把它放走
@@ -159,27 +188,27 @@ export class EnemySeeker extends ColiReceiver{
     }
 
     protected onEntre(enemy:Enemy, position:Vec2):void{
-        const count = this._countList.read(enemy.symbol.data);
+        const count = this._countList.read(enemy.symbol.data + "");
 
         if (count === undefined || count <= 0) {//此敌人未被记录
             this.captureList.push(enemy);
-            this._countList.edit(enemy.symbol.data, 1);
+            this._countList.edit(enemy.symbol.data + "", 1);
         } else {//此敌人已被记录
-            this._countList.edit(enemy.symbol.data, count + 1);
+            this._countList.edit(enemy.symbol.data + "", count + 1);
         }
     }
 
     protected onLeave(enemy:Enemy, position:Vec2):void{
-        const count = this._countList.read(enemy.symbol.data);
+        const count = this._countList.read(enemy.symbol.data + "");
         if (count === undefined) {
             //理论上不会有未捕获的敌人还向这里发布离开事件
             //但是还是加个判空以防万一
             return;
         }
         if (count > 1) {//这个目标离开了一个监控中的区域，但还处于至少一个监控区域中
-            this._countList.edit(enemy.symbol.data, count - 1);
+            this._countList.edit(enemy.symbol.data + "", count - 1);
         } else {//这个目标离开了所有监控中的区域
-            this._countList.edit(enemy.symbol.data, 0);//进入次数设为0
+            this._countList.edit(enemy.symbol.data + "", 0);//进入次数设为0
             ArrayAlgo.removeEle(enemy, this.captureList);//从列表里删掉
             if (this.focus === enemy) {//如果这个enemy在被focus就把focus删掉
                 this.focus = null;
@@ -198,14 +227,3 @@ export class EnemySeeker extends ColiReceiver{
     }
 }
 
-
-
-
-export class TTTT{
-    constructor(){
-        // let list = new KVPair<Oprt, string>();
-        // let k = new Oprt();
-        // list.edit(k, "ab");
-        // console.log(list);
-    }
-}

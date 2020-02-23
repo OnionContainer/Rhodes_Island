@@ -1,15 +1,3 @@
-2020/02/07-12:50:45.844 5014 Reusing MANIFEST D:\LayaProjects\Rhodes_Hub\Rhodes_Island\.laya\chrome\Default\Local Storage\leveldb/MANIFEST-000001
-2020/02/07-12:50:45.844 5014 Recovering log #153
-2020/02/07-12:50:45.845 5014 Reusing old log D:\LayaProjects\Rhodes_Hub\Rhodes_Island\.laya\chrome\Default\Local Storage\leveldb/000153.log 
-2020/02/07-12:51:45.848 20c8 Level-0 table #156: started
-2020/02/07-12:51:45.904 20c8 Level-0 table #156: 13659 bytes OK
-2020/02/07-12:51:45.955 20c8 Delete type=0 #153
-2020/02/07-12:51:45.956 20c8 Compacting 4@0 + 1@1 files
-2020/02/07-12:51:46.009 20c8 Generated table #157@0: 37 keys, 7101 bytes
-2020/02/07-12:51:46.009 20c8 Compacted 4@0 + 1@1 files => 7101 bytes
-2020/02/07-12:51:46.054 20c8 compacted to: files[ 0 1 0 0 0 0 0 ]
-2020/02/07-12:51:46.092 20c8 Delete type=2 #144
-2020/02/07-12:51:46.092 20c8 Delete type=2 #146
-2020/02/07-12:51:46.092 20c8 Delete type=2 #150
-2020/02/07-12:51:46.092 20c8 Delete type=2 #152
-2020/02/07-12:51:46.092 20c8 Delete type=2 #156
+2020/02/21-21:41:06.129 2a00 Reusing MANIFEST D:\LayaProjects\Rhodes_Hub\Rhodes_Island\.laya\chrome\Default\Local Storage\leveldb/MANIFEST-000001
+2020/02/21-21:41:06.129 2a00 Recovering log #166
+2020/02/21-21:41:06.130 2a00 Reusing old log D:\LayaProjects\Rhodes_Hub\Rhodes_Island\.laya\chrome\Default\Local Storage\leveldb/000166.log 

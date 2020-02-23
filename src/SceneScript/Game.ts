@@ -1,7 +1,6 @@
 import {ui} from "../ui/layaMaxUI";
 import RhodesGame from "../Rhodes_Game/RhodesGame";
 import { LinkList } from "../OneFileModules/DataStructure";
-import { TTTT } from "../Rhodes_Game/Managers/Actor/ActorModules/OprtAtk";
 
 
 
@@ -21,7 +20,6 @@ export default class Game extends ui.GameSceneUI{
 
         let centre = new Laya.EventDispatcher();
 
-        new TTTT();
 
         
 

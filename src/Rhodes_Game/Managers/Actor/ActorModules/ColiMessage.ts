@@ -79,6 +79,18 @@ export class ColiEmit{
         this._pastSet = current;//更新历史碰撞集合为当前碰撞集合
     };
 
+    
+    /**
+     * 发布离开当前存在的所有坐标的事件
+     * @param publisher 
+     * @param identity 
+     */
+    public eventLeaveAll(publisher?:any, identity:string = Actor.Identity.ACTOR):void{
+        this._pastSet.forEach(vec=>{
+            EventCentre.instance.event(EventCentre.EType.LEAVE(vec, identity), publisher);
+        });
+    }
+
     constructor(x:number,y:number,width:number = ColiEmit.GLOBAL_UNIT_SUBWIDTH, height:number = ColiEmit.GLOBAL_UNIT_SUBHEIGHT){
         this._rec = new Rec(x,y,width,height);
     }

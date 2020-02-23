@@ -1,4 +1,5 @@
 import Oprt from "./Actor/Oprt";
+import { Vec2 } from "../../OneFileModules/MyMath";
 
 export default class OprtMgr{
 
@@ -6,6 +7,7 @@ export default class OprtMgr{
 
     constructor(){
         let oprt:Oprt = new Oprt();
+        oprt.onStage(new Vec2(0,0));
         this._OprtList.push(oprt);
     }
 

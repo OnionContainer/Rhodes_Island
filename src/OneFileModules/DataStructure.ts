@@ -1,12 +1,20 @@
 import { Comparable } from "./MyMath";
 
-export class KVPair<K,V>{
+
+
+export class KVPair<V>{
     private _list:any = {};
-    public edit(key:K, value:V):void{
+    public edit(key:string, value:V):void{
         this._list[key] = value;
     }
-    public read(key:K):V{
+    public read(key:string):V{
         return this._list[key];
+    }
+    
+    public iterate(f:(k:string,v:V)=>void):void{
+        for (let k in this._list) {
+            f(k, this._list[k]);
+        }
     }
 }
 

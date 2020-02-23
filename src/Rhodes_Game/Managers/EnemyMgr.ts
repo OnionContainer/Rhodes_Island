@@ -5,6 +5,7 @@ import { EventCentre } from "../../OneFileModules/EventCentre";
 import { ArrayAlgo } from "../../OneFileModules/DataStructure";
 import { ColiReceiver, ColiEmit } from "./Actor/ActorModules/ColiMessage";
 import Path from "./Path";
+import PerformanceCentre from "../../Performance_Module/Performance_Module/PerformanceCentre";
     
 
 class EnemyMatrix extends ColiReceiver{
@@ -43,7 +44,6 @@ class EnemyMatrix extends ColiReceiver{
      */
     protected onLeave(actor:Enemy, position:Vec2){
         ArrayAlgo.removeEle(actor, this._matrix[position.x][position.y]);
-        
     }
 }
 
@@ -109,12 +109,20 @@ export default class EnemyMgr{
 
         let e = new Enemy();
         e.pos.setSpeed(5);
-        this.enemyToStage(e,this.pathInfo.read("default"));
+        this.toStage(e,this.pathInfo.read("default"));
         console.log(e);
+
+        
 
         //上面这些都不重要
 
         this.matrix = new EnemyMatrix(10,10);//这里应该是两个从数据库中得到的数字
+
+        //@redcall
+        PerformanceCentre.Initialization(Laya.stage);
+        PerformanceCentre.instance.NewRect(new Vec2(), new Vec2(100,100), "#ff0000", PerformanceCentre.instance.MainSpr, e);
+
+        EventCentre.instance.on(EventCentre.EType.ENEMY_DEAD, this, this.onEnemyDead);//注册敌人死亡事件
     }
 
     public update():void{
@@ -126,7 +134,7 @@ export default class EnemyMgr{
      * 此函数将一个敌人移入onStage区域
      * @param enemy 
      */
-    private enemyToStage(enemy:Enemy, path:Vec2[]):void{
+    private toStage(enemy:Enemy, path:Vec2[]):void{
         this.enemyOnStage.push(enemy);
         enemy.correspondedPath = path;
         enemy.pathSegCount = 1;
@@ -135,18 +143,37 @@ export default class EnemyMgr{
         // console.log(path[0], enemy.pos.data);
     }
 
+    private onEnemyDead(enemy:Enemy):void{
+        enemy.grid.eventLeaveAll(enemy, Actor.Identity.ENEMY);
+        const index = this.enemyOnStage.indexOf(enemy);
+        if (index === -1) {
+            throw new DOMException("Enemy that is not exist is trying to die", "Void Dead Exception");
+        }
+        this.enemyDeadZone.push(this.enemyOnStage.splice(index,1)[0]);
+    }
+
     /**
      * 移动所有在场上的enemy对象
      * 发布移动事件
      */
     private moveAllEnemy():void{
 
-        let enemy = this.enemyOnStage[0];
-        enemy.pos.setTarget(new Vec2(Laya.stage.mouseX, Laya.stage.mouseY));
-        enemy.pos.move();
-        enemy.grid.pos(enemy.pos.data.x, enemy.pos.data.y);
-        enemy.grid.event(enemy, Actor.Identity.ENEMY);
+        let enemy = this.enemyOnStage[0];//选取唯一一个敌人对象
+        if (enemy === undefined) {
+            return;
+        }
 
+        enemy.pos.setTarget(new Vec2(Laya.stage.mouseX, Laya.stage.mouseY));//设定目标（跟随鼠标）
+        if (enemy.profile.blocked) {//敌人在不阻挡时不进行移动
+            return;
+        }
+        enemy.pos.move();//修改敌人位置
+        enemy.grid.pos(enemy.pos.data.x, enemy.pos.data.y);//修改敌人碰撞箱位置
+        enemy.grid.event(enemy, Actor.Identity.ENEMY);//发布碰撞事件
+
+        PerformanceCentre.instance.RepositionSpr(enemy, enemy.pos.data);
+
+        //注意：阻挡逻辑还未写入下面的正式代码
         if (Math.random()<10) {
             return;
         }
@@ -168,5 +195,19 @@ export default class EnemyMgr{
     }
 
 }
+
+// class EnemyEServer{
+//     private _mgr:EnemyMgr;
+
+//     constructor(mgr:EnemyMgr) {
+//         this._mgr = mgr;
+//         EventCentre.instance.on(EventCentre.EType.ENEMY_DEAD, this, this.onEnemyDead);
+//     }
+
+//     private onEnemyDead(enemy:Enemy) {
+//         enemy.grid.eventLeaveAll(enemy, Actor.Identity.ENEMY);
+//         this._mgr.
+//     }
+// }
 
 
