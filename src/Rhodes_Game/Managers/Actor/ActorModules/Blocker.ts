@@ -21,7 +21,7 @@ export class Blocker extends ColiReceiver{
     
     private _blockPoint:Vec2;//阻挡点
     private get _source():Enemy[]{
-        return RhodesGame.instance.enemyMgr.matrix.checkPoint(this._blockPoint.x, this._blockPoint.y);
+        return RhodesGame.getInstance().enemyMgr.matrix.checkPoint(this._blockPoint.x, this._blockPoint.y);
     }
     private _level:number = 0;//当前阻挡消耗
     private _maxLevel:number = 3;//最高阻挡消耗
