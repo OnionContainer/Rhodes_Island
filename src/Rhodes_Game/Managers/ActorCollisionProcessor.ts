@@ -1,6 +1,6 @@
-import Actor from "../Actor";
-import {MySymbol} from "../../../../OneFileModules/Symbol";
-import {CircleCollisionRange, CollisionRange} from "./CollisionRange";
+import Actor from "./Actor/Actor";
+import {MySymbol} from "../../OneFileModules/Symbol";
+import {CircleCollisionRange} from "../../OneFileModules/CollisionRange";
 
 
 /**
@@ -13,23 +13,23 @@ import {CircleCollisionRange, CollisionRange} from "./CollisionRange";
  */
 export class ActorCollisionProcessor {
 
-    private colliderMap: { [key: number]: ActorCollider<any> } = {};
+    private colliderMap: { [key: number]: ActorCollider } = {};
 
-    public registerCollider(collider: ActorCollider<any>) {
+    public registerCollider(collider: ActorCollider) {
         this.colliderMap[collider.symbol.data] = collider;
     }
 
-    public unregisterCollider(collider: ActorCollider<any>) {
+    public unregisterCollider(collider: ActorCollider) {
         delete this.colliderMap[collider.symbol.data];
     }
 
-    public recalculate() {
+    public update() {
         for (let i in this.colliderMap) {
             let targetCollider = this.colliderMap[i];
             let collidingList = [];
             for (let j in this.colliderMap) {
                 let collider = this.colliderMap[j];
-                if (collider.symbol.data == targetCollider.symbol.data) {
+                if (collider == targetCollider) {
                     continue;
                 }
                 if (targetCollider.shouldCollideWith(collider) && targetCollider.getCollisionRange().isCoincideWithRange(collider.getCollisionRange())) {
@@ -43,18 +43,18 @@ export class ActorCollisionProcessor {
 }
 
 
-export abstract class ActorCollider<T extends CollisionRange> {
+export abstract class ActorCollider {
     //唯一标识
     public readonly symbol: MySymbol = new MySymbol();
 
     //获取碰撞范围
-    abstract getCollisionRange(): T ;
+    abstract getCollisionRange(): CircleCollisionRange ;
 
     /**
      * 重设碰撞范围
      * @param range 新的碰撞范围
      */
-    abstract setCollisionRange(range: T);
+    abstract setCollisionRange(range: CircleCollisionRange);
 
     //获取碰撞器的所有者
     abstract getActor(): Actor;
@@ -63,18 +63,18 @@ export abstract class ActorCollider<T extends CollisionRange> {
      * 碰撞列表需要刷新
      * @param collidingList 新的碰撞列表
      * */
-    abstract onCollidingListRefresh(collidingList: ActorCollider<T>[]);
+    abstract onCollidingListRefresh(collidingList: ActorCollider[]);
 
     /**
      * 是否应该与指定碰撞器发生碰撞
      * @param collider 另一个碰撞器
      * */
-    abstract shouldCollideWith(collider: ActorCollider<T>): boolean;
+    abstract shouldCollideWith(collider: ActorCollider): boolean;
 
     /**
      * 当前碰撞列表
      * */
-    abstract getCollidingList(): ActorCollider<T>[];
+    abstract getCollidingList(): ActorCollider[];
 
     /**
      * 刷新碰撞范围，使其跟随所有者移动
@@ -83,9 +83,9 @@ export abstract class ActorCollider<T extends CollisionRange> {
 
 }
 
-export abstract class SimpleActorCollider extends ActorCollider<CircleCollisionRange> {
+export abstract class SimpleActorCollider extends ActorCollider {
 
-    private collidingList: ActorCollider<any>[] = [];
+    private collidingList: ActorCollider[] = [];
     private readonly actor: Actor;
     private range: CircleCollisionRange;
 
@@ -108,11 +108,11 @@ export abstract class SimpleActorCollider extends ActorCollider<CircleCollisionR
         return this.actor;
     }
 
-    getCollidingList(): ActorCollider<any>[] {
+    getCollidingList(): ActorCollider[] {
         return this.collidingList;
     }
 
-    onCollidingListRefresh(collidingList: ActorCollider<any>[]) {
+    onCollidingListRefresh(collidingList: ActorCollider[]) {
         this.collidingList = collidingList;
     }
 

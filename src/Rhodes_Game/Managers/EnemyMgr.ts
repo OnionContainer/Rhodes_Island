@@ -6,8 +6,8 @@ import {ArrayAlgo} from "../../OneFileModules/DataStructure";
 import {ColiEmit, ColiReceiver} from "./Actor/ActorModules/ColiMessage";
 import PerformanceCentre from "../../Performance_Module/Performance_Module/PerformanceCentre";
 import {OprtSeeker} from "./Actor/ActorModules/EnemyAtk";
-import {CircleCollisionRange} from "./Actor/ActorModules/CollisionRange";
-import {ActorCollider, SimpleActorCollider} from "./Actor/ActorModules/ActorCollisionProcessor";
+import {CircleCollisionRange} from "../../OneFileModules/CollisionRange";
+import {ActorCollider, SimpleActorCollider} from "./ActorCollisionProcessor";
 import Oprt from "./Actor/Oprt";
 
 
@@ -131,17 +131,21 @@ export default class EnemyMgr {
 
         //创建干员对象监视器<-创建监视范围碰撞器<-创建碰撞范围
         //碰撞器需要定义与所有者位置绑定的碰撞范围刷新方法、是否应该与另一个碰撞器发生碰撞的判断方法
-        e.state.seeker = new OprtSeeker(new class extends SimpleActorCollider {
-            refreshCollisionRangeFollowActor() {
-                let actor = <Enemy>this.getActor();
-                this.getCollisionRange().center.x = actor.pos.data.x;
-                this.getCollisionRange().center.y = actor.pos.data.y;
-            }
+        e.seeker = new OprtSeeker(
+            new class extends SimpleActorCollider {
+                refreshCollisionRangeFollowActor() {
+                    let actor = <Enemy>this.getActor();
+                    this.getCollisionRange().center.x = actor.pos.data.x;
+                    this.getCollisionRange().center.y = actor.pos.data.y;
+                }
 
-            shouldCollideWith(collider: ActorCollider<CircleCollisionRange>): boolean {
-                return collider.getActor() instanceof Oprt;
-            }
-        }(e, new CircleCollisionRange(new Vec2(e.pos.data.x, e.pos.data.y), e.profile.attackRangeRadius)));
+                shouldCollideWith(collider: ActorCollider): boolean {
+                    return collider.getActor() instanceof Oprt;
+                }
+            }(
+                e, new CircleCollisionRange(new Vec2(e.pos.data.x, e.pos.data.y), e.profile.attackRangeRadius)
+            )
+        );
 
 
         //@redcall

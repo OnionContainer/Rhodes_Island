@@ -5,6 +5,7 @@ import { ColiEmit } from "./ActorModules/ColiMessage";
 import { Profile } from "./ActorModules/Profile";
 import { Symbolized, MySymbol } from "../../../OneFileModules/Symbol";
 import { Buff } from "./ActorModules/Buff";
+import {Seeker} from "./ActorModules/AtkAbst";
 // import { GridSpace } from "./ActorModules/GridSpace";
 
 export class ActorIdentity{
@@ -27,6 +28,16 @@ export default abstract class Actor implements Symbolized{
     public grid:ColiEmit = new ColiEmit(0,0);//碰撞事件发布模块
     public profile:Profile = new Profile();//基本属性合集
     public buffList:Buff[] = [];
+
+    /**
+     * 目标选择器
+     */
+    public seeker: Seeker;
+
+    /*
+    * 当前锁定目标
+    * */
+    public focus: Actor;
     
     constructor() {
         this.symbol = new MySymbol();
