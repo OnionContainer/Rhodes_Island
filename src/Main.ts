@@ -1,6 +1,7 @@
 import GameConfig from "./GameConfig";
 import SceneManager from "./SceneManager";
-import FixTime from "./Rhodes_Game/FixTime";
+import FixTime from "./Fix/FixTime";
+import RhodesGame from "./Rhodes_Game/RhodesGame";
 
 class Main {
 	constructor() {
@@ -22,6 +23,7 @@ class Main {
 
 		//GAME INIT (GLOBAL MODULE)
 		FixTime.init();
+		RhodesGame.Instance.init();
 
 		//激活资源版本控制，version.json由IDE发布功能自动生成，如果没有也不影响后续流程
 		Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
@@ -42,6 +44,7 @@ class Main {
 
 	private _update(): void {
 		FixTime.update();
+		RhodesGame.Instance.update();
 	}
 }
 

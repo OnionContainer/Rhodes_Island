@@ -22,9 +22,6 @@ export class EventCentre{
     public off(type:string, caller:any, listener:Function){
         this._centre.off(type, caller, listener);
     }
-
-
-    private constructor(){}
 }
 
 

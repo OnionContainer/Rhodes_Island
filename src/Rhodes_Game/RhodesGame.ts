@@ -10,6 +10,7 @@ import {Damage} from "./Managers/Actor/ActorModules/Damage";
 import Oprt from "./Managers/Actor/Oprt";
 import EnemyMgr from "./Managers/EnemyMgr";
 import {ActorCollisionProcessor} from "./Managers/Actor/ActorModules/ActorCollisionProcessor";
+import OnionLog from "../Common/OnionLog";
 
 
 class ColiReporter extends ColiReceiver {
@@ -71,11 +72,15 @@ class ColiReporter extends ColiReceiver {
  *
  */
 export default class RhodesGame {
+    private static _instance: RhodesGame;
+    public static get Instance(): RhodesGame {
+        return this._instance || (this._instance = new this());
+    }
+
 
     /**
      * modified by XWV
      */
-    private static instance: RhodesGame;
 
     public actorEServer: ActorEServer;
     public oprtMgr: OprtMgr;
@@ -83,35 +88,24 @@ export default class RhodesGame {
 
     /**
      * by XWV
+     * Modified by KR
      */
     public readonly actorCollisionProcessor: ActorCollisionProcessor = new ActorCollisionProcessor();
+    private _reporter: ColiReporter;    //ADVICE: PRIVATE USE UNDERLINE
 
-    private reporter;
-
-    static getInstance(): RhodesGame {
-        if (!RhodesGame.instance) {
-            RhodesGame.instance = new RhodesGame();
-        }
-        return RhodesGame.instance
-    }
 
     /**
      * modified by XWV
      */
-    private constructor() {
-
-        // RhodesGame.instance = this;
+    public init() {
         EventCentre.init();
         this.actorEServer = new ActorEServer();
-        this.reporter = new ColiReporter();//@test
-        console.log(this.reporter);
+        this._reporter = new ColiReporter();//@test
+        OnionLog.debug(this._reporter);
         //init stage
 
         this.oprtMgr = new OprtMgr();
         this.enemyMgr = new EnemyMgr();
-
-        Laya.timer.loop(20, this, this.update);
-
     }
 
     public update(): void {
