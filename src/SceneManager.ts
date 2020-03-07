@@ -2,18 +2,16 @@
 // import Database from "./Toybox/Database";
 
 export default class SceneManager{
-    private loadingScene:string = "LoadingScene.scene";
-    private gameScene:string = "GameScene.scene";
-    constructor(){
-        // EventCentre.init();
-        // Database.init();
-        //初始化事件中心和数据库
-        
-        // Laya.Scene.open(this.loadingScene);//打开加载场景
+    private static _instance: SceneManager;
+    public static get Instance() {
+        return this._instance || (this._instance = new this());
+    }
+
+    private readonly loadingScene:string = "LoadingScene.scene";
+    private readonly gameScene:string = "GameScene.scene";
+
+    public awake(): void {
         Laya.Scene.open(this.gameScene);
-        // EventCentre.instance.once("Init", "Regular", this, ()=>{//监听加载完毕事件
-        //     Laya.Scene.open(this.gameScene);
-        // });
     }
 }
 
