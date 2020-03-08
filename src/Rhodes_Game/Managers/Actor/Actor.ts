@@ -37,7 +37,6 @@ export default abstract class Actor implements Symbolized{
     public grid:ColiEmit = new ColiEmit(0,0);//碰撞事件发布模块
     public profile:Profile = new Profile();//基本属性合集
 
-    public buffList:Buff[] = [];
 
     /**
      * 目标选择器
