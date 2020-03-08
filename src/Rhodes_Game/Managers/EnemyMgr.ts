@@ -95,12 +95,13 @@ export default class EnemyMgr {
     private renderer: TheBestRendererEver = new TheBestRendererEver();//测试用模块
 
     private enemyOnStage: Enemy[] = [];//已经处于战场上的敌人
-    private enemyOffStage: Enemy[] = [];//进入战场前的敌人
-    private enemyDeadZone: Enemy[] = [];//已死亡的敌人
+    private enemyPrepared: Enemy[] = [];//进入战场前的敌人
+    private deadEnemies: Enemy[] = [];//已死亡的敌人
 
     public matrix: EnemyMatrix;
 
     constructor() {
+        //@test
         this.pathInfo.add("default",
             Vec2.listFromList([
                 [500, 500],
@@ -153,11 +154,23 @@ export default class EnemyMgr {
 
     public update(): void {
         this.moveAllEnemy();//移动所有的enemy
-        this.renderer.render(this.enemyOnStage);
+        this.enemyOnStage.forEach(ele=>{
+
+            //ele.skill.update();//更新所有技能实例
+
+            ele.buffList.forEach(buff=>{//更新所有buff实例
+                buff.update();
+            });
+
+            ele.atkSM.update();//更新所有攻击状态机实例
+        });
+        
+        // this.renderer.render(this.enemyOnStage);
     }
 
     /**
      * 此函数将一个敌人移入onStage区域
+     * enemy只能通过这个函数进入战场
      * @param enemy
      */
     private toStage(enemy: Enemy, path: Vec2[]): void {
@@ -169,13 +182,17 @@ export default class EnemyMgr {
         // console.log(path[0], enemy.pos.data);
     }
 
+    /**
+     * 监听敌人死亡事件的函数
+     * @param enemy 
+     */
     private onEnemyDead(enemy: Enemy): void {
         enemy.grid.eventLeaveAll(enemy, Actor.Identity.ENEMY);
         const index = this.enemyOnStage.indexOf(enemy);
         if (index === -1) {
             throw new DOMException("Enemy that is not exist is trying to die", "Void Dead Exception");
         }
-        this.enemyDeadZone.push(this.enemyOnStage.splice(index, 1)[0]);
+        this.deadEnemies.push(this.enemyOnStage.splice(index, 1)[0]);
     }
 
     /**
