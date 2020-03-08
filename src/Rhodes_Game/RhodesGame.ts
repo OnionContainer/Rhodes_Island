@@ -9,8 +9,8 @@ import {ArrayAlgo} from "../OneFileModules/DataStructure";
 import {Damage} from "./Managers/Actor/ActorModules/Damage";
 import Oprt from "./Managers/Actor/Oprt";
 import EnemyMgr from "./Managers/EnemyMgr";
-import {ActorCollisionProcessor} from "./Managers/Actor/ActorModules/ActorCollisionProcessor";
 import OnionLog from "../Common/OnionLog";
+import {ActorCollisionProcessor} from "./Managers/ActorCollisionProcessor";
 
 
 class ColiReporter extends ColiReceiver {
@@ -125,36 +125,6 @@ export default class RhodesGame {
  */
 export class ActorEServer {
     constructor() {
-        EventCentre.instance.on(EventCentre.EType.ATTACK, this, this.onAttack);
+        // EventCentre.instance.on(EventCentre.EType.ATTACK, this, this.onAttack);
     }
-
-    /**
-     * 伤害处理逻辑
-     * @param from
-     * @param to
-     */
-    public onAttack(from: Actor, to: Actor) {
-        let damage: Damage = new Damage(from.profile.attackPower);
-        from.buffList.forEach(e => {
-            damage = e.launchDamage(damage);
-        });
-        to.buffList.forEach(e => {
-            damage = e.recieveDamage(damage);
-        });
-        const value = damage.finalValue();
-        to.profile.hitPoint -= value;
-
-        //@test
-        console.log(`${(to instanceof Oprt) ? "Oprt" : "Enemy"} is damaged, cur hp: ${to.profile.hitPoint}/${to.profile.maxHitPoint}`);
-        if (to.profile.hitPoint <= 0) {
-            console.log(typeof to + "dead");
-            const eType: string = to instanceof Oprt ? EventCentre.EType.OPRT_DEAD : EventCentre.EType.ENEMY_DEAD;
-            EventCentre.instance.event(eType, to);
-        }
-        //Redcall
-        //@todo 绘图逻辑
-
-    }
-
-
 }

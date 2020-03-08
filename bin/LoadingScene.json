@@ -1,1 +1,0 @@
-{"type":"Scene","props":{"width":1200,"runtime":"SceneScript/Loading.ts","height":800},"compId":2,"child":[{"type":"Text","props":{"y":346,"x":192.5,"width":815,"text":"ShowMeTheCode","height":108,"fontSize":100,"color":"#6c2120","runtime":"laya.display.Text"},"compId":3}],"loadList":[],"loadList3D":[]}

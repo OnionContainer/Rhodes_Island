@@ -7,24 +7,21 @@ export enum DamageType{
 }
 
 export class Damage{
-    public source:Actor
 
-
-    public atk:number = 0;//基础攻击力
+    public source:Actor = null;//伤害来源
+    public value:number = 0;//攻击力
     public type:DamageType//伤害类型
-    
-    public pctResistance:number = 1;//百分比抗性
-    public pctIncrement:number = 1;//百分比增长（比如阿的百分比增长buff）
-    public numResistance:number = 0;//数值抗性
-    public numIncrement:number = 0;//数值增长
-    //基数的加减直接体现在atk上
-    public primary:boolean = true;//是否为非间接伤害（间接伤害会触发星熊、年的反甲之类的效果）
+    public primary:boolean = true;//是否为非间接伤害（间接伤害不会触发星熊、年的反甲之类的效果）
 
-    constructor(basicATK:number = 0){
-        this.atk = basicATK;
+    constructor(source:Actor, value:number, type:DamageType){
+        this.value = value;
     }
 
-    public finalValue():number{
-        return this.atk*this.pctIncrement/this.pctResistance+this.numIncrement-this.numResistance;
+    public copy():Damage{
+        let result = new Damage(this.source, this.value, this.type);
+        result.type = this.type;
+        result.primary = this.primary;
+        result.source = this.source;
+        return result;
     }
 }

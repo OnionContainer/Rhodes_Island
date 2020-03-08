@@ -18,10 +18,43 @@ export default class OprtMgr {
         return this._OprtList.indexOf(oprt);
     }
 
+    /**
+     * 部署干员
+     * @param place 位置
+     * @param symbol 部署干员编号
+     */
+    public deployOprt(place:Vec2, symbol:number):void{
+        //@todo
+        //部署干员
+    }
+
+    /**
+     * 干员死亡事件处理
+     * @param symbol 死亡干员编号
+     */
+    public onOprtDie(symbol:number):void{
+
+        //@todo
+        //处理死亡事件
+    }
 
     public update(): void {
         this._OprtList.forEach(ele => {
-            ele.state.execute(ele);
+            //ele.skill.update();//技能实例更新
+
+            ele.buffList.forEach(buff=>{
+                buff.update();
+            });//增益/减益状态实例更新
+
+            ele.atkSM.update();//攻击状态机更新
         });
     }
 }
+
+/**
+ * 干员管理类需提供的接口：
+ * 
+ * 部署干员
+ * 
+ * 消灭干员
+ */

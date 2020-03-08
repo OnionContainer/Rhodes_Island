@@ -1,18 +1,38 @@
 import { Damage } from "./Damage";
+import Actor from "../Actor";
+import Oprt from "../Oprt";
 
+export enum BuffType{
+    Default = "Default",
+    PowerStrike = "PowerStrike"
+}
+
+
+/**
+ * 作者：草生葱
+ * 
+ */
 export abstract class Buff{
-    /**
-     * 处理发出的伤害对象的函数
-     * @param damage 
-     */
-    public launchDamage(damage:Damage):Damage{
-        return damage;
+
+    public creator:Actor;
+    public keeper:Actor;
+    public type:BuffType = BuffType.Default;
+    public time:number = 0;
+
+
+    constructor(creator:Actor=null, keeper:Actor=null, type:BuffType=BuffType.Default){
+        this.creator = creator;
+        this.keeper = keeper;
+        this.type = type;
     }
+
     /**
-     * 处理接收的伤害对象的函数
-     * @param damage 
+     * 每帧更新内容
      */
-    public recieveDamage(damage:Damage):Damage{
-        return damage;
-    }
+    public update():void{}
+
+    /**
+     * 摧毁此buff时触发的函数
+     */
+    public onDestroy():void{}
 }
