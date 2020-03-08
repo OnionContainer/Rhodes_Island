@@ -1,5 +1,5 @@
 import Oprt from "../Oprt";
-import {ActorCollider} from "../../ActorCollisionProcessor";
+import {ActorCollider} from "./ActorCollisionProcessor";
 import {Seeker} from "./AtkAbst";
 import RhodesGame from "../../../RhodesGame";
 import {Enemy} from "../Enemy";
@@ -8,19 +8,19 @@ import {Enemy} from "../Enemy";
 /**
  * by XWV
  */
-export class OprtSeeker implements Seeker {
+export class OprtSeeker implements Seeker<Oprt> {
 
-    private collider: ActorCollider;
+    private collider: ActorCollider<any>;
 
-    constructor(collider: ActorCollider) {
+    constructor(collider: ActorCollider<any>) {
         this.collider = collider;
     }
 
-    public getCollider(): ActorCollider {
+    public getCollider(): ActorCollider<any> {
         return this.collider;
     }
 
-    public resetCollider(collider: ActorCollider) {
+    public resetCollider(collider: ActorCollider<any>) {
         let processor = RhodesGame.getInstance().actorCollisionProcessor;
         if (this.collider) {
             processor.unregisterCollider(this.collider);
@@ -79,10 +79,6 @@ export class OprtSeeker implements Seeker {
             }
         });
         return result;
-    }
-
-    followActor() {
-        this.collider.refreshCollisionRangeFollowActor();
     }
 
 }

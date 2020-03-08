@@ -3,6 +3,7 @@ import {Vec2} from "../../../OneFileModules/MyMath";
 import {Pos} from "./ActorModules/Position";
 import Oprt from "./Oprt";
 import {AtkStateMachine} from "./ActorModules/AtkAbst";
+import {OprtSeeker} from "./ActorModules/EnemyAtk";
 
 export class Enemy extends Actor {
 
@@ -13,7 +14,7 @@ export class Enemy extends Actor {
     /**
      * by XWV
      */
-    public readonly state: AtkStateMachine = new AtkStateMachine(this);
+    public readonly state: AtkStateMachine<Enemy, Oprt, OprtSeeker> = new AtkStateMachine<Enemy, Oprt, OprtSeeker>(this);
 
 
     constructor() {
@@ -36,7 +37,10 @@ export class Enemy extends Actor {
     public move() {
         this.pos.move();//修改敌人位置
         this.grid.pos(this.pos.data.x, this.pos.data.y);//修改敌人碰撞箱位置
-        this.seeker.followActor();//目标选择器跟随自身移动
+        this.state.seeker.getCollider().refreshCollisionRangeFollowActor();//修改索敌范围碰撞器
         this.grid.event(this, this.identity);//发布碰撞事件
     }
 }
+
+
+

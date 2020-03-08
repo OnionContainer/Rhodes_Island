@@ -1,0 +1,14 @@
+{
+    "bug0":{
+        "name": "bug0",
+        "speed": 0.6,
+        "img": "Basic/兵蚁奔跑2.png",
+        "HP": 150
+    },
+    "bug1":{
+        "name": "bug1",
+        "speed": 2,
+        "img": "Basic/OperatorSample_A.png",
+        "HP": 120
+    }
+}
