@@ -9,7 +9,7 @@ import {ArrayAlgo} from "../OneFileModules/DataStructure";
 import {Damage} from "./Managers/Actor/ActorModules/Damage";
 import Oprt from "./Managers/Actor/Oprt";
 import EnemyMgr from "./Managers/EnemyMgr";
-import {ActorCollisionProcessor} from "./Managers/Actor/ActorModules/ActorCollisionProcessor";
+import {ActorCollisionProcessor} from "./Managers/ActorCollisionProcessor";
 
 
 class ColiReporter extends ColiReceiver {
