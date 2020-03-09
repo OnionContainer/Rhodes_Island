@@ -8,12 +8,7 @@ import { EventCentre } from "../../../../OneFileModules/EventCentre";
 import { Buff } from "./Buff";
 import { Damage } from "./Damage";
 
-class Brave extends Buff{
-    public launchDamage(damage:Damage):Damage{
-        damage.numIncrement += 10;
-        return damage;
-    }
-}
+
 
 enum StateType{
     WAIT = "WAIT",
@@ -75,7 +70,7 @@ class Prepare implements State{
             if (this.time >= oprt.profile.prepTime) {
                 console.log("Attack & to After Phase @" + this.time);//进行攻击
                 EventCentre.instance.event(EventCentre.EType.ATTACK, [oprt, this.focus]);
-                oprt.buffList.push(new Brave());
+                // oprt.buffList.push(new Brave());
                 ////////进行攻击补充攻击函数！
                 //进入后摇状态
                 let after:After_Atk = machine.stateList.read(StateType.AFTER_ATK) as After_Atk;
