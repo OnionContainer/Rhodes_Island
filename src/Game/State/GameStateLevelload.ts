@@ -16,7 +16,6 @@ export default class GameStateLevelLoad extends GameStateBase{
 
     public leave(): void {
         super.leave();
-        DodResourceMgr.Instance.setLevelID(null);
     }
 
     public reset(): void {
@@ -25,9 +24,11 @@ export default class GameStateLevelLoad extends GameStateBase{
 
     public update(): void {
         super.update();
-        if (true == this._battle.isLevelPreprared()) {
-            RhodesGame.Instance.stateMgr.runState(GameStateID.Battle);
-            DodLog.debug(`GameStateLevelload.update: level [${DodResourceMgr.Instance.getLevelID()}] is prepared. `);
+        if (true == DodResourceMgr.Instance.isLevelPrepared()) {
+            if (true == this._battle.isLevelPreprared()) {
+                RhodesGame.Instance.stateMgr.runState(GameStateID.Battle);
+                DodLog.debug(`GameStateLevelload.update: level [${DodResourceMgr.Instance.getLevelID()}] is prepared. `);
+            }
         }
     }
 }

@@ -49,6 +49,7 @@ class Main {
 	private _update(): void {
 		FixTime.update();
 		RhodesGame.Instance.update();
+		DodResourceMgr.Instance.update();
 	}
 }
 
