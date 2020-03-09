@@ -1,6 +1,7 @@
 import Actor from "./Actor/Actor";
 import {MySymbol} from "../../OneFileModules/Symbol";
 import {CircleCollisionRange} from "../../OneFileModules/CollisionRange";
+import {Enemy} from "./Actor/Enemy";
 
 
 /**
@@ -42,13 +43,21 @@ export class ActorCollisionProcessor {
 
 }
 
+export enum ActorCollisionType {
+    ACTOR_BODY = 1,
+    SEEKER_RANGE = 2
+}
 
 export abstract class ActorCollider {
+
+
     //唯一标识
     public readonly symbol: MySymbol = new MySymbol();
 
     //获取碰撞范围
     abstract getCollisionRange(): CircleCollisionRange ;
+
+    abstract getActorCollisionType(): ActorCollisionType;
 
     /**
      * 重设碰撞范围
@@ -83,18 +92,23 @@ export abstract class ActorCollider {
 
 }
 
-export abstract class SimpleActorCollider extends ActorCollider {
+export class SimpleActorCollider extends ActorCollider {
 
     private collidingList: ActorCollider[] = [];
     private readonly actor: Actor;
     private range: CircleCollisionRange;
+    private readonly type: ActorCollisionType;
 
-    constructor(actor: Actor, range: CircleCollisionRange) {
+    constructor(actor: Actor, range: CircleCollisionRange, type: ActorCollisionType) {
         super();
         this.actor = actor;
         this.range = range;
+        this.type = type;
     }
 
+    getActorCollisionType(): ActorCollisionType {
+        return this.type;
+    }
 
     getCollisionRange(): CircleCollisionRange {
         return this.range;
@@ -114,6 +128,21 @@ export abstract class SimpleActorCollider extends ActorCollider {
 
     onCollidingListRefresh(collidingList: ActorCollider[]) {
         this.collidingList = collidingList;
+    }
+
+    refreshCollisionRangeFollowActor() {
+        if (this.getActor() instanceof Enemy) {
+            let actor = <Enemy>this.getActor();
+            this.getCollisionRange().center.x = actor.pos.data.x;
+            this.getCollisionRange().center.y = actor.pos.data.y;
+        }
+
+    }
+
+    shouldCollideWith(collider: ActorCollider): boolean {
+        return this.getActor().identity != collider.getActor().identity
+            && this.getActorCollisionType() == ActorCollisionType.SEEKER_RANGE
+            && collider.getActorCollisionType() == ActorCollisionType.ACTOR_BODY;
     }
 
 

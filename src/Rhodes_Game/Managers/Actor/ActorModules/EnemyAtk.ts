@@ -21,7 +21,7 @@ export class OprtSeeker implements Seeker {
     }
 
     public resetCollider(collider: ActorCollider) {
-        let processor = RhodesGame.getInstance().actorCollisionProcessor;
+        let processor = RhodesGame.Instance.actorCollisionProcessor;
         if (this.collider) {
             processor.unregisterCollider(this.collider);
         }
@@ -38,16 +38,23 @@ export class OprtSeeker implements Seeker {
         let result: Oprt[] = [];
         let actor = this.collider.getActor();
         if (actor instanceof Enemy) {
-            if (result.length < count) {
+            if (actor.profile.blocker) {
                 result.push(actor.profile.blocker);
             }
         }
+
         let captureList = this.getCaptureList();
         captureList.sort(((a, b): number => {
             //按优先级倒序排列
             return -OprtSeeker.comparePriorityLevel(a, b);
         }));
 
+        result.forEach(function (e) {
+            if (captureList.indexOf(e)) {
+                captureList.splice(captureList.indexOf(e), 1);
+            }
+        });
+        result.push(...captureList);
 
         return result.slice(0, count);
     }
@@ -58,7 +65,7 @@ export class OprtSeeker implements Seeker {
         let dHateLevel = oprtA.profile.hateLevel - oprtB.profile.hateLevel;
 
         if (dHateLevel == 0) {  //仇恨等级相等
-            let oprtMgr = RhodesGame.getInstance().oprtMgr;
+            let oprtMgr = RhodesGame.Instance.oprtMgr;
 
             //部署序号差，部署顺序越靠后序号值越大，越容易被攻击
             return oprtMgr.getDeploymentOrderNumber(oprtA) - oprtMgr.getDeploymentOrderNumber(oprtB);
