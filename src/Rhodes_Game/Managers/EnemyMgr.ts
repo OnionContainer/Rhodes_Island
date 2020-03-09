@@ -7,8 +7,7 @@ import {ColiEmit, ColiReceiver} from "./Actor/ActorModules/ColiMessage";
 import PerformanceCentre from "../../Performance_Module/Performance_Module/PerformanceCentre";
 import {OprtSeeker} from "./Actor/ActorModules/EnemyAtk";
 import {CircleCollisionRange} from "../../OneFileModules/CollisionRange";
-import {ActorCollider, SimpleActorCollider} from "./ActorCollisionProcessor";
-import Oprt from "./Actor/Oprt";
+import {ActorCollisionType, SimpleActorCollider} from "./ActorCollisionProcessor";
 
 
 class EnemyMatrix extends ColiReceiver {
@@ -132,21 +131,14 @@ export default class EnemyMgr {
 
         //创建干员对象监视器<-创建监视范围碰撞器<-创建碰撞范围
         //碰撞器需要定义与所有者位置绑定的碰撞范围刷新方法、是否应该与另一个碰撞器发生碰撞的判断方法
-        e.seeker = new OprtSeeker(
-            new class extends SimpleActorCollider {
-                refreshCollisionRangeFollowActor() {
-                    let actor = <Enemy>this.getActor();
-                    this.getCollisionRange().center.x = actor.pos.data.x;
-                    this.getCollisionRange().center.y = actor.pos.data.y;
-                }
-
-                shouldCollideWith(collider: ActorCollider): boolean {
-                    return collider.getActor() instanceof Oprt;
-                }
-            }(
-                e, new CircleCollisionRange(new Vec2(e.pos.data.x, e.pos.data.y), e.profile.attackRangeRadius)
-            )
-        );
+        e.seeker = new OprtSeeker(new SimpleActorCollider(
+            e,
+            new CircleCollisionRange(
+                new Vec2(e.pos.data.x, e.pos.data.y),
+                e.profile.attackRangeRadius
+            ),
+            ActorCollisionType.SEEKER_RANGE
+        ));
 
 
         //@redcall
@@ -158,17 +150,17 @@ export default class EnemyMgr {
 
     public update(): void {
         this.moveAllEnemy();//移动所有的enemy
-        this.enemyOnStage.forEach(ele=>{
+        this.enemyOnStage.forEach(ele => {
 
             //ele.skill.update();//更新所有技能实例
 
-            ele.buffList.forEach(buff=>{//更新所有buff实例
+            ele.buffList.forEach(buff => {//更新所有buff实例
                 buff.update();
             });
 
             ele.atkSM.update();//更新所有攻击状态机实例
         });
-        
+
         // this.renderer.render(this.enemyOnStage);
     }
 
@@ -188,7 +180,7 @@ export default class EnemyMgr {
 
     /**
      * 监听敌人死亡事件的函数
-     * @param enemy 
+     * @param enemy
      */
     private onEnemyDead(enemy: Enemy): void {
         enemy.grid.eventLeaveAll(enemy, Actor.Identity.ENEMY);
