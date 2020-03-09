@@ -1,7 +1,9 @@
 import GameConfig from "./GameConfig";
 import SceneManager from "./SceneManager";
 import FixTime from "./Fix/FixTime";
-import RhodesGame from "./Rhodes_Game/RhodesGame";
+import RhodesGame from "./Game/RhodesGame";
+import { EventCentre } from "./Event/EventCentre";
+import DodResourceMgr from "./Resources/DodResourceMgr";
 
 class Main {
 	constructor() {
@@ -24,6 +26,8 @@ class Main {
 		//GAME INIT (GLOBAL MODULE)
 		FixTime.init();
 		RhodesGame.Instance.init();
+		DodResourceMgr.Instance.init();
+		EventCentre.init();
 
 		//激活资源版本控制，version.json由IDE发布功能自动生成，如果没有也不影响后续流程
 		Laya.ResourceVersion.enable("version.json", Laya.Handler.create(this, this.onVersionLoaded), Laya.ResourceVersion.FILENAME_VERSION);
