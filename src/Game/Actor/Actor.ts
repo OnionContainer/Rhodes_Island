@@ -1,27 +1,16 @@
-import { Vec2, DodMath } from "../../Common/DodMath";
-import { PArray } from "../../Common/DodDataStructure";
-import { Pos } from "./ActorModules/Position";
 import { ColiEmit } from "./ActorModules/ColiMessage";
 import { Profile } from "./ActorModules/Profile";
 import { Symbolized, MySymbol } from "../../Fix/FixSymbol";
 import { Buff } from "./ActorModules/Buff";
 import {Seeker} from "./ActorModules/AtkAbst";
-import { AtkStateMachine } from "./ActorModules/AtkAbst";
 import { Damage } from "./ActorModules/Damage";
-import { EventCentre } from "../../Event/EventCentre";
-
-// import { GridSpace } from "./ActorModules/GridSpace";
-
+import { ActorIdentity } from "../../Common/DodKey";
 
 /**
  * 这个东西不是enum是个历史遗留问题
  * 凑合用吧，Actor.Identity里可以拿到
+ * TO 阿葱： 懒死你……
  */
-export class ActorIdentity{
-    public readonly ACTOR:string = "ACTOR";
-    public readonly ENEMY:string = "ENEMY";
-    public readonly OPERATOR:string = "OPERATOR";
-}
 
 /**
  * 作者：葱
@@ -52,19 +41,12 @@ abstract class ActorRequire{
 }
 
 export default abstract class Actor extends ActorRequire implements Symbolized{
-    public symbol:MySymbol;//全局唯一的标识数字
+    public symbol: MySymbol;//全局唯一的标识数字
 
-    public static readonly Identity:ActorIdentity = new ActorIdentity();//Actor身份enum
-
-    private _identity:string = Actor.Identity.ACTOR;//默认身份为Actor
-    public get identity():string{return this._identity;}
-    
-
-    
+    private _identity: ActorIdentity = ActorIdentity.None//默认身份为Actor
 
     public grid:ColiEmit = new ColiEmit(0,0);//碰撞事件发布模块
     public profile:Profile = new Profile();//基本属性合集
-
 
     /**
      * 目标选择器
