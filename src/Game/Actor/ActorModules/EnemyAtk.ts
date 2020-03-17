@@ -1,6 +1,6 @@
 import Oprt from "../Oprt";
 import {ActorCollider} from "../../Collision/ActorCollisionProcessor";
-import {Seeker} from "./AtkAbst";
+import {Seeker} from "../Attack/AtkAbst";
 import RhodesGame from "../../RhodesGame";
 import {Enemy} from "../Enemy";
 

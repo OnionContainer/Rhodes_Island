@@ -2,9 +2,11 @@ import { ColiEmit } from "./ActorModules/ColiMessage";
 import { Profile } from "./ActorModules/Profile";
 import { Symbolized, MySymbol } from "../../Fix/FixSymbol";
 import { Buff } from "./ActorModules/Buff";
-import {Seeker} from "./ActorModules/AtkAbst";
+import {Seeker, AtkStateMachine} from "./Attack/AtkAbst";
 import { Damage } from "./ActorModules/Damage";
-import { ActorIdentity } from "../../Common/DodKey";
+import { ActorType } from "../../Common/DodKey";
+import ActorStateMgr, { ActorStateID } from "./State/ActorStateFsm";
+import { Blocker } from "./ActorModules/Blocker";
 
 /**
  * 这个东西不是enum是个历史遗留问题
@@ -12,60 +14,100 @@ import { ActorIdentity } from "../../Common/DodKey";
  * TO 阿葱： 懒死你……
  */
 
-/**
- * 作者：葱
- * 这里只是记录一下Actor需要有什么接口，然后丢给Actor继承一下防报错
- * 此类本身没有实际意义
- * 请勿使用
- * 
- * 另：这些操作似乎违反了单一职责原则
- * Actor应该只开放“操作接口”
- * 而Actor.profile只开放“数据访问接口”
- * 待讨论
- */
-abstract class ActorRequire{
+ //tmp remove
+// /**
+//  * 作者：葱
+//  * 这里只是记录一下Actor需要有什么接口，然后丢给Actor继承一下防报错
+//  * 此类本身没有实际意义
+//  * 请勿使用
+//  * 
+//  * 另：这些操作似乎违反了单一职责原则
+//  * Actor应该只开放“操作接口”
+//  * 而Actor.profile只开放“数据访问接口”
+//  * 待讨论
+//  */
+// abstract class ActorRequire{
 
-    setAbleToBlock(state:boolean):void{}//设为可以进行阻挡/不可以进行阻挡
+//     setAbleToBlock(state:boolean):void{}//设为可以进行阻挡/不可以进行阻挡
 
-    ableToBlock():boolean{return true;}//可以进行阻挡
+//     ableToBlock():boolean{return true;}//可以进行阻挡
 
-    setMoveable(state:boolean):void{}//设为可以移动/不可以移动
+//     setMoveable(state:boolean):void{}//设为可以移动/不可以移动
 
-    moveable():boolean{return true;}//可以进行移动
+//     moveable():boolean{return true;}//可以进行移动
 
-    setBlocked(state:boolean):void{}//设为已被阻挡/未被阻挡
+//     setBlocked(state:boolean):void{}//设为已被阻挡/未被阻挡
 
-    isBlocked():boolean{return true;}//已被阻挡
+//     isBlocked():boolean{return true;}//已被阻挡
 
-    ableToBeBlocked():boolean{return true;}//可以被阻挡
-}
+//     ableToBeBlocked():boolean{return true;}//可以被阻挡
+// }
 
-export default abstract class Actor extends ActorRequire implements Symbolized{
-    public symbol: MySymbol;//全局唯一的标识数字
 
-    private _identity: ActorIdentity = ActorIdentity.None//默认身份为Actor
+//基本原则：少用继承，多用组合
+export default class Actor implements Symbolized{
+    public symbol: MySymbol; //全局唯一的标识数字
+    public type: ActorType; //默认身份为Actor
 
-    public grid:ColiEmit = new ColiEmit(0,0);//碰撞事件发布模块
-    public profile:Profile = new Profile();//基本属性合集
+    public state: ActorStateMgr; //状态机 统筹状态更新
 
-    /**
-     * 目标选择器
-     */
-    public seeker: Seeker;
+    public profile:Profile;//基本属性合集
+    public atk: AtkStateMachine;
+    public grid:ColiEmit;
 
-    /*
-    * 当前锁定目标
-    * */
-    public focus: Actor;
+    //TODO：去包一个组件
+    // /**
+    //  * 目标选择器
+    //  */
+    // public seeker: Seeker;
 
-    public buffList:Buff[] = [];//增益/减益状态列表
-    public skill:any = null;//这是技能
-    public atkSM:any = {update: function(){}};//攻击状态机
+    // /*
+    // * 当前锁定目标
+    // * */
+    // public focus: Actor;
 
     
-    constructor() {
-        super();
+    constructor(type: ActorType, res: any) {
         this.symbol = new MySymbol();
+        this.type = type;
+        this.state = new ActorStateMgr(this);
+        // according to different type, add different components to this actor. 
+
+        this.profile = new Profile(this, res['xxx']); 
+        this.atk = new AtkStateMachine(this, res['xxx']);
+        this.blocker = new ActorBlocker(this);
+        this.buff = new ActorBuffMgr(this, res['xxx']);
+        this.transform = new Transform(this);
+        this.render = new Render(this);
+        this.animation = new Animation(this, res['xxx']);
+        
+        if (ActorType.Monster == this.type) {
+            this.route = new MonsterRoute(this, res['xxx']);
+        } else if (ActorType.Operator == this.type) {
+            this.skill = new ActorSkill(this, res['xxx']);
+            this.cost = new ActorCost(this);
+        }
+    }
+
+    public awake(): void {
+        this.state.runState(ActorStateID.Prepred);
+    }
+
+    public update(): void {
+        this.state.update();
+    }
+
+    public reset(): void {
+        // reset clear resource related module
+        this.render.reset();
+    }
+
+    public setOnMap(): void {
+        //TODO
+    }
+
+    public setPosition(): void {
+        //TODO
     }
 
     /**

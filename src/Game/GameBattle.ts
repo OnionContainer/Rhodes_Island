@@ -1,15 +1,13 @@
-import EnemyMgr from "./Actor/EnemyMgr";
 import GameMap from "./GameLevel";
-import OprtMgr from "./Actor/OprtMgr";
 import { ActorCollisionProcessor } from "./Collision/ActorCollisionProcessor";
 import GameLevel from "./GameLevel";
 import DodResourceMgr from "../Resources/DodResourceMgr";
+import ActorMgr from "./Actor/ActorMgr";
 
 export default class GameBattle {
     public level: GameLevel;
     public map: GameMap;
-    public enemyMgr: EnemyMgr;
-    public oprtMgr: OprtMgr;
+    public actorMgr: ActorMgr;
 
     public collision: ActorCollisionProcessor;
 
@@ -18,8 +16,7 @@ export default class GameBattle {
     constructor() {
         this.level = new GameLevel();
         this.map = new GameMap();
-        this.enemyMgr = new EnemyMgr();
-        this.oprtMgr = new OprtMgr();
+        this.actorMgr = new ActorMgr();
 
         this.collision = new ActorCollisionProcessor();
     }
@@ -29,10 +26,7 @@ export default class GameBattle {
         let res = DodResourceMgr.Instance.getCurrentLevelRes();
         this.level.init(res['level']); //just sample
         this.map.init(res['map']);
-
-        //UNITE ENEMYMGR & OPRTMGR AS ACTORMGR LATER. 
-        //this.enemyMgr.init();
-        //this.oprtMgr.init();
+        this.actorMgr.init(res['map']);
 
         //AND DONT FORGET RESET LAST BATTLE DATA REMAINS. 
         //this.collision.reset();

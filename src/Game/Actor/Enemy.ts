@@ -2,7 +2,7 @@ import Actor from "./Actor";
 import {Vec2} from "../../Common/DodMath";
 import {Pos} from "./ActorModules/Position";
 import Oprt from "./Oprt";
-import {AtkStateMachine} from "./ActorModules/AtkAbst";
+import {AtkStateMachine} from "./Attack/AtkAbst";
 
 export class Enemy extends Actor {
 

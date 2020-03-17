@@ -5,10 +5,9 @@
 
 //又另： 建议在使用enum的时候加一个空值None以应对判定问题
 
-export enum ActorIdentity {
+export enum ActorType {
     None,
     Operator,
-    Enemy, //之后抛弃这个类型
     Monster,
     Token
     //这其实是对应的不同的数据模板

@@ -7,7 +7,7 @@ import { KVPair, ArrayAlgo } from "../../../Common/DodDataStructure";
 import Oprt from "../Oprt";
 import EnemyMgr from "../EnemyMgr";
 import RhodesGame from "../../RhodesGame";
-import { Seeker } from "./AtkAbst";
+import { Seeker } from "../Attack/AtkAbst";
 
 
 /**
