@@ -6,7 +6,6 @@ import { AtkStateMachine } from "./Attack/AtkAbst";
 import { Damage } from "./ActorModules/Damage";
 import { ActorType } from "../../Common/DodKey";
 import ActorStateMgr, { ActorStateID } from "./State/ActorStateFsm";
-import { Blocker } from "./ActorModules/Blocker";
 import { ActorBuffMgr } from "./ActorModules/ActorBuffMgr";
 import { Transform } from "./ActorModules/Transform";
 import { UnitRender } from "./ActorModules/UnitRender";
@@ -14,7 +13,7 @@ import { Animation } from "./ActorModules/Animation";
 import Route from "./ActorRoute";
 import { ActorSkill } from "./ActorModules/ActorSkill";
 import { ActorCost } from "./ActorModules/ActorCost";
-
+import { Blocker } from "./Attack/Blocker";
 
 
 
