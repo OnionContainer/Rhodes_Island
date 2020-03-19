@@ -39,11 +39,16 @@ class Main {
 	}
 
 	public onConfigLoaded(): void {
+
+		// Laya.Scene.open("GameScene");
+		// if (1==1){
+		// 	return;
+		// }
 		//Resources Related Module Awake
 		SceneManager.Instance.awake();
 		//Awake Game Engine Loop
 		Laya.timer.loop(16, this, this._update);
-
+		
 	}
 
 	private _update(): void {

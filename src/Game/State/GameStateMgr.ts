@@ -5,6 +5,7 @@ import GameStateLevelLoad from "./GameStateLevelload";
 import GameStateGameload from "./GameStateGameload";
 import GameStateLobby from "./GameStateLobby";
 import RhodesGame from "../RhodesGame";
+import GameBattle from "../GameBattle";
 
 export enum GameStateID {
     None,
@@ -23,9 +24,9 @@ export default class GameStateMgr {
     private _states: GameStateBase[];
     private _currentState: GameStateBase;
 
-    constructor() {
+    constructor(battle:GameBattle) {
         this._currentState = null;
-        let battle = RhodesGame.Instance.battle;
+        // let battle = RhodesGame.Instance.battle;
     
         this._states = [];
         this._states.push(null);

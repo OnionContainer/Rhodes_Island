@@ -27,8 +27,9 @@ export default class RhodesGame {
     public lobby: GameLobby;
 
     public constructor() {
-        this.stateMgr = new GameStateMgr();
         this.battle = new GameBattle();
+        this.stateMgr = new GameStateMgr(this.battle);
+        
     }
 
     public init(): void {
