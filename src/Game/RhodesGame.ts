@@ -36,7 +36,7 @@ export default class RhodesGame {
         DodLog.debug(`RhodesGame: initialization complete. `)
     }
 
-    public update(): void { 
+    public update(): void {
         this.stateMgr.update();
     }
 

@@ -2,11 +2,18 @@ import { ColiEmit } from "./ActorModules/ColiMessage";
 import { Profile } from "./ActorModules/Profile";
 import { Symbolized, MySymbol } from "../../Fix/FixSymbol";
 import { Buff } from "./ActorModules/Buff";
-import {Seeker, AtkStateMachine} from "./Attack/AtkAbst";
+import { AtkStateMachine } from "./Attack/AtkAbst";
 import { Damage } from "./ActorModules/Damage";
 import { ActorType } from "../../Common/DodKey";
 import ActorStateMgr, { ActorStateID } from "./State/ActorStateFsm";
 import { Blocker } from "./ActorModules/Blocker";
+import { ActorBuffMgr } from "./ActorModules/ActorBuffMgr";
+import { Transform } from "./ActorModules/Transform";
+import { UnitRender } from "./ActorModules/UnitRender";
+import { Animation } from "./ActorModules/Animation";
+import Route from "./ActorRoute";
+import { ActorSkill } from "./ActorModules/ActorSkill";
+import { ActorCost } from "./ActorModules/ActorCost";
 
 
 
@@ -20,9 +27,18 @@ export default class Actor implements Symbolized{
 
     public state: ActorStateMgr; //状态机 统筹状态更新
 
-    public profile:Profile;//基本属性合集
+    public profile:Profile;//基本属性与访问方法合集
+
     public atk: AtkStateMachine;
-    public grid:ColiEmit;
+    public coliEmit:ColiEmit;
+    public blocker:Blocker;
+    public buffMgr:ActorBuffMgr;
+    public transform:Transform;
+    public render:UnitRender;
+    public animation:Animation;
+    public route:Route;
+    public skill:ActorSkill;
+    public cost:ActorCost;
 
     //TODO：去包一个组件
     // /**
@@ -44,17 +60,24 @@ export default class Actor implements Symbolized{
 
         this.profile = new Profile(this, res['xxx']); 
         this.atk = new AtkStateMachine(this, res['xxx']);
-        this.blocker = new ActorBlocker(this);
-        this.buff = new ActorBuffMgr(this, res['xxx']);
+        this.blocker = new Blocker(this);
+        
+        this.buffMgr = new ActorBuffMgr(this, res['xxx']);
         this.transform = new Transform(this);
-        this.render = new Render(this);
+        this.render = new UnitRender(this);
+        
         this.animation = new Animation(this, res['xxx']);
         
+
+        //
         if (ActorType.Monster == this.type) {
-            this.route = new MonsterRoute(this, res['xxx']);
+            this.route = new Route(this, res['xxx']);
+
         } else if (ActorType.Operator == this.type) {
             this.skill = new ActorSkill(this, res['xxx']);
+            
             this.cost = new ActorCost(this);
+            
         }
     }
 
@@ -68,7 +91,7 @@ export default class Actor implements Symbolized{
 
     public reset(): void {
         // reset clear resource related module
-        this.render.reset();
+        // this.render.reset();
     }
 
     public setOnMap(): void {
@@ -107,15 +130,16 @@ export default class Actor implements Symbolized{
     /**
      * 移除buff
      * @param buff 
+     * 接口移除
      */
-    public removeBuff(buff:Buff):void{
-        let i:number = this.buffList.indexOf(buff);
-        if (i == -1) {
-            return;
-        }
-        this.buffList[i].onDestroy();
-        this.buffList.splice(i,1);
-    }
+    // public removeBuff(buff:Buff):void{
+    //     let i:number = this.buffList.indexOf(buff);
+    //     if (i == -1) {
+    //         return;
+    //     }
+    //     this.buffList[i].onDestroy();
+    //     this.buffList.splice(i,1);
+    // }
 }
 
 

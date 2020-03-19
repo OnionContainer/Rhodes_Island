@@ -1,6 +1,5 @@
 import { Damage } from "./Damage";
 import Actor from "../Actor";
-import Oprt from "../Oprt";
 
 export enum BuffType{
     Default = "Default",

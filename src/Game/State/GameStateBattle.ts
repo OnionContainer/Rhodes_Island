@@ -1,8 +1,9 @@
 import GameStateBase from "./GameStateBase";
 import RhodesGame from "../RhodesGame";
+import GameBattle from "../GameBattle";
 
 export default class GameStateBattle extends GameStateBase{
-    constructor(battle) {
+    constructor(battle:GameBattle) {
         super(battle);
     }
 
@@ -22,7 +23,5 @@ export default class GameStateBattle extends GameStateBase{
         super.update();
         
         this._battle.map.update();
-        this._battle.enemyMgr.update();
-        this._battle.oprtMgr.update();
     }
 }

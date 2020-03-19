@@ -3,6 +3,7 @@ import { FixRect } from "../../../Fix/FixRect";
 import { ArrayAlgo } from "../../../Common/DodDataStructure";
 import { EventCentre } from "../../../Event/EventCentre";
 import Actor from "../Actor";
+import { ActorType } from "../../../Common/DodKey";
 
 /**
  * 碰撞消息发布者
@@ -56,7 +57,7 @@ export class ColiEmit{
         return this;
     }
 
-    public event(publisher?:any, identity:string = Actor.Identity.ACTOR):void{
+    public event(publisher?:any, identity:ActorType = ActorType.None):void{
         let current:Vec2[] = this.findIntersect();//当前碰撞集合
         //this._pastSet//历史碰撞集合
         //离开：处于历史碰撞集合，但不处于当前碰撞集合的元素
@@ -68,12 +69,12 @@ export class ColiEmit{
         //发布事件
         // console.log("离开");
         leave.forEach(ele=>{
-            EventCentre.instance.event(EventCentre.EType.LEAVE(ele, identity), publisher);
+            EventCentre.instance.event(EventCentre.EType.LEAVE(ele, `${identity}`), publisher);
         });
 
         // console.log("进入");
         entre.forEach(ele=>{
-            EventCentre.instance.event(EventCentre.EType.ENTRE(ele, identity), publisher);
+            EventCentre.instance.event(EventCentre.EType.ENTRE(ele, `${identity}`), publisher);
         });
 
         this._pastSet = current;//更新历史碰撞集合为当前碰撞集合
@@ -85,9 +86,9 @@ export class ColiEmit{
      * @param publisher 
      * @param identity 
      */
-    public eventLeaveAll(publisher?:any, identity:string = Actor.Identity.ACTOR):void{
+    public eventLeaveAll(publisher?:any, identity:ActorType = ActorType.None):void{
         this._pastSet.forEach(vec=>{
-            EventCentre.instance.event(EventCentre.EType.LEAVE(vec, identity), publisher);
+            EventCentre.instance.event(EventCentre.EType.LEAVE(vec, `${identity}`), publisher);
         });
     }
 

@@ -2,6 +2,7 @@ import { ColiReceiver, ColiEmit } from "../Actor/ActorModules/ColiMessage";
 import { Vec2 } from "../../Common/DodMath";
 import Actor from "../Actor/Actor";
 import { ArrayAlgo } from "../../Common/DodDataStructure";
+import { ActorType } from "../../Common/DodKey";
 
 
 export default class ColiReporter extends ColiReceiver {
@@ -12,7 +13,7 @@ export default class ColiReporter extends ColiReceiver {
         super(10, 10);
         for (let w = 0; w < 10; w += 1) {
             for (let h = 0; h < 10; h += 1) {
-                this.setDetection(new Vec2(w, h), Actor.Identity.ENEMY);
+                this.setDetection(new Vec2(w, h), `${ActorType.Monster}`);
             }
         }
 
