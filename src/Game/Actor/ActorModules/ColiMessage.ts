@@ -51,6 +51,12 @@ export class ColiEmit{
         return this;
     }
 
+    public posByVec(vec:Vec2):ColiEmit{
+        this._rec.x = vec.x;
+        this._rec.y = vec.y;
+        return this;
+    }
+
     public size(width:number, height:number):ColiEmit{
         this._rec.width = width;
         this._rec.height = height;

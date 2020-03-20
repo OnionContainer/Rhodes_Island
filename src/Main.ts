@@ -6,6 +6,8 @@ import { EventCentre } from "./Event/EventCentre";
 import DodResourceMgr from "./Resources/DodResourceMgr";
 import PerformanceCentre from "./Common/Graphics/Performance_Module/PerformanceCentre";
 import { Vec2 } from "./Common/DodMath";
+import Actor from "./Game/Actor/Actor";
+import { ActorType } from "./Common/DodKey";
 
 class Main {
 	constructor() {
@@ -26,6 +28,16 @@ class Main {
 		Laya.alertGlobalError = true;
 
 		//GAME INIT (GLOBAL MODULE)
+		console.log("PC init");
+		PerformanceCentre.initialize(Laya.stage);
+
+		//test
+		PerformanceCentre.instance.initBoard([
+			[0,0,0,0],
+			[0,0,0,0]
+		], new Vec2(50,50), new Vec2(100,100), "#ff00ff", "#ffff00");
+		//test end
+
 		FixTime.init();
 		RhodesGame.Instance.init();
 		DodResourceMgr.Instance.init();
@@ -43,12 +55,10 @@ class Main {
 	public onConfigLoaded(): void {
 
 		
+
 		SceneManager.Instance.awake();
-		PerformanceCentre.initialize(Laya.stage);
-		PerformanceCentre.instance.initBoard([
-			[0,0,0,0],
-			[0,0,0,0]
-		], new Vec2(50,50), new Vec2(100,100), "#ff00ff", "#ffff00");
+		
+		
 		//Awake Game Engine Loop
 		Laya.timer.loop(16, this, this._update);
 		

@@ -1,10 +1,15 @@
 import Actor from "./Actor";
 import { ActorType } from "../../Common/DodKey";
+import { ActorStateID } from "./State/ActorStateFsm";
 
 export default class ActorMgr {
     public actors: Array<Actor>;
     constructor() {
         this.actors = new Array<Actor>();
+
+        //test
+        this.createActor(ActorType.Monster, {});
+        this.actors[0].state.runState(ActorStateID.Walk);
     }
 
     public init(res: any) {

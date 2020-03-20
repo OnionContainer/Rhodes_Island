@@ -1,5 +1,6 @@
 import { Damage, DamageType } from "./Damage";
 import Actor from "../Actor";
+import { ActorType } from "../../../Common/DodKey";
 
 
 /**

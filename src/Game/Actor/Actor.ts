@@ -22,20 +22,20 @@ import { Blocker } from "./Attack/Blocker";
 //基本原则：少用继承，多用组合
 export default class Actor implements Symbolized{
     public symbol: MySymbol; //全局唯一的标识数字
-    public type: ActorType; //默认身份为Actor
+    public type: ActorType = ActorType.None; //默认身份为Actor
 
     public state: ActorStateMgr; //状态机 统筹状态更新
 
     public profile:Profile;//基本属性与访问方法合集
 
-    public atk: AtkStateMachine;
-    public coliEmit:ColiEmit;
-    public blocker:Blocker;
+    public atk: AtkStateMachine;//攻击状态机
+    public coliEmit:ColiEmit;//碰撞事件发布者
+    public blocker:Blocker;//阻挡模块
     public buffMgr:ActorBuffMgr;
     public transform:Transform;
     public render:UnitRender;
     public animation:Animation;
-    public route:Route;
+    public route:Route;//路径对象
     public skill:ActorSkill;
     public cost:ActorCost;
 
@@ -52,6 +52,9 @@ export default class Actor implements Symbolized{
 
     
     constructor(type: ActorType, res: any) {
+
+        res['xxx'] = 1145141919810;
+
         this.symbol = new MySymbol();
         this.type = type;
         this.state = new ActorStateMgr(this);
@@ -66,9 +69,7 @@ export default class Actor implements Symbolized{
         this.render = new UnitRender(this);
         
         this.animation = new Animation(this, res['xxx']);
-        
-
-        //
+ 
         if (ActorType.Monster == this.type) {
             this.route = new Route(this, res['xxx']);
 
@@ -81,7 +82,7 @@ export default class Actor implements Symbolized{
     }
 
     public awake(): void {
-        this.state.runState(ActorStateID.Prepred);
+        this.state.runState(ActorStateID.Prepared);
     }
 
     public update(): void {
