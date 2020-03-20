@@ -1,4 +1,5 @@
 import { Vec2 } from "../Common/DodMath";
+import { MySymbol } from "../Fix/FixSymbol";
 //////
 export class EventCentre{
     public static instance:EventCentre;
@@ -6,6 +7,7 @@ export class EventCentre{
     public static init():void{
         EventCentre.instance = new EventCentre();
         EventCentre.EType = new EType();
+        EventCentre.init = ()=>{};
     };
 
     private _centre:Laya.EventDispatcher = new Laya.EventDispatcher();
@@ -21,42 +23,31 @@ export class EventCentre{
     public off(type:string, caller:any, listener:Function){
         this._centre.off(type, caller, listener);
     }
+
+
+    private constructor(){}
 }
 
 
 class EType {
-
-    /**
-     * LEAVE事件
-     * 参数：e:Actor
-     * 
-     * ENTRE事件
-     * 参数：e:Actor
-     * 
-     * ATTACK事件
-     * 参数：from:Actor, to:Actor
-     * 
-     * ENEMY_DEAD事件
-     * 参数: e:Enemy
-     * 
-     * Oprt_DEAD事件
-     * 参数: e:Oprt
-     */
-    public 总之我先放一个函数在这里():void{}
-    
     public LEAVE(pos:Vec2, identity:string):string{
         return `${identity}:COLLISION_EVENT_LEAVE_FROM(${pos.x}|${pos.y})`;
     }
     public ENTRE(pos:Vec2, identity:string):string{
         return `${identity}:COLLISION_EVENT_ENTRE_TO(${pos.x}|${pos.y})`;
     }
-    public get ATTACK():string{
-        return "ATTACK";
+
+    /**
+     * new added for performance starts here
+     */
+    public PERFORMANCE_RESCALE():string{
+        return "RESCALE";
     }
-    public get ENEMY_DEAD():string{
-        return "ENEMY_DEAD";
+
+    public PERFORMANCE_TEXT_SWITCH():string{
+        return "TEXT_SWITCH";
     }
-    public get OPRT_DEAD():string{
-        return "OPRT_DEAD";
-    }
+    /**
+     * new added for performance ends here
+     */
 }

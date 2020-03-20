@@ -1,4 +1,4 @@
-import { Symbolized } from "../Fix/FixSymbol";
+import { Symbolized, MySymbol } from "../Fix/FixSymbol";
 import { Vec2 } from "./DodMath";
 
 export interface Renderer{
@@ -8,7 +8,7 @@ export interface Renderer{
      * @param size 宽度/高度 
      * @param scale 缩放比（默认为1）
      */
-    initBoard(size:Vec2, scale?:number):void
+    initBoard(arr: number[][], posVec2: Vec2, unitsize: Vec2, backGroundColor: string, frontColor: string, scale?: number):void
 
     /**
      * 重设棋盘缩放比
@@ -30,7 +30,7 @@ export interface Renderer{
      * @param current 最小值
      * @param color 进度条颜色（背景颜色默认）
      */
-    editBar(bound:Symbolized, max:number, current:number, color?:string):void
+    editBar(bound:Symbolized, symb:number, percentage?:number, color?:string):void
     
     /**
      * 默认攻击特效
@@ -91,5 +91,5 @@ export interface Renderer{
      * @param size 按钮尺寸（要有默认尺寸）
      * @param color 颜色（要有默认颜色，而且要针对默认位置多次添加默认颜色做优化）
      */
-    attachButton(bound:Symbolized, callback:Function, text?:string, pos?:Vec2, size?:Vec2, color?:string):void
+    attachButton(bound:Symbolized,num:number, callback:Function, text?:string, pos?:Vec2, size?:Vec2, color?:string):void
 }

@@ -4,6 +4,8 @@ import FixTime from "./Fix/FixTime";
 import RhodesGame from "./Game/RhodesGame";
 import { EventCentre } from "./Event/EventCentre";
 import DodResourceMgr from "./Resources/DodResourceMgr";
+import PerformanceCentre from "./Common/Graphics/Performance_Module/PerformanceCentre";
+import { Vec2 } from "./Common/DodMath";
 
 class Main {
 	constructor() {
@@ -40,12 +42,13 @@ class Main {
 
 	public onConfigLoaded(): void {
 
-		// Laya.Scene.open("GameScene");
-		// if (1==1){
-		// 	return;
-		// }
-		//Resources Related Module Awake
+		
 		SceneManager.Instance.awake();
+		PerformanceCentre.initialize(Laya.stage);
+		PerformanceCentre.instance.initBoard([
+			[0,0,0,0],
+			[0,0,0,0]
+		], new Vec2(50,50), new Vec2(100,100), "#ff00ff", "#ffff00");
 		//Awake Game Engine Loop
 		Laya.timer.loop(16, this, this._update);
 		
