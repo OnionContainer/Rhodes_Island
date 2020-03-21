@@ -102,6 +102,14 @@ export class Vec2 implements Comparable{
     }
 
     /**
+     * 求和两个Vec，返回结果，不修改原实例
+     * @param vec 
+     */
+    public plus(vec:Vec2):Vec2{
+        return new Vec2(this.x + vec.x, this.y + vec.y);
+    }
+
+    /**
      * 以输入坐标为中心进行顺时针90度旋转
      * （未完成）
      * @param centre 

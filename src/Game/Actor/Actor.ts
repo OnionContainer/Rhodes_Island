@@ -29,7 +29,7 @@ export default class Actor implements Symbolized{
     public profile:Profile;//基本属性与访问方法合集
 
     public atk: AtkStateMachine;//攻击状态机
-    public coliEmit:ColiEmit;//碰撞事件发布者
+    public coliEmit:ColiEmit = new ColiEmit(0,0,ColiEmit.GLOBAL_UNIT_SUBWIDTH,ColiEmit.GLOBAL_UNIT_SUBHEIGHT);//碰撞事件发布者
     public blocker:Blocker;//阻挡模块
     public buffMgr:ActorBuffMgr;
     public transform:Transform;

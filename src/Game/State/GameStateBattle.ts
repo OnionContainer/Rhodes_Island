@@ -21,7 +21,8 @@ export default class GameStateBattle extends GameStateBase{
 
     public update(): void {
         super.update();
-        
+        console.log("BattleState update")
+        this._battle.actorMgr.update();
         this._battle.map.update();
     }
 }

@@ -2,6 +2,7 @@ import {KVPair} from "../../../Common/DodDataStructure";
 import Actor from "../Actor";
 import {EventCentre} from "../../../Event/EventCentre";
 import { Seeker } from "./ActorSeeker";
+import FixTime from "../../../Fix/FixTime";
 
 
 /**
@@ -10,7 +11,7 @@ import { Seeker } from "./ActorSeeker";
  * 葱 修改于 3/18
  *      将Seeker挪入攻击状态机内，不由Actor持有
  *      不同的攻击范围由Seeker替换来实现
- *      不同的攻击逻辑（范围/单体）由替换状态机内的状态实例实现
+ *      不同的攻击逻辑（范围/单体）由修改profile中的参数实现
  *      AtkStateMachine负责对外提供所有修改/访问接口
  *      仍需对此进行进一步规划（单体/多体/群体攻击逻辑是仅由一个参数实现，还是由多态实现）
  *      //todo:时间累加逻辑改变
@@ -139,6 +140,26 @@ export class AtkStateMachine {
 
     public seeker: Seeker;
 
+    private _prepTime:number;//前摇时间/帧
+    private _coolTime:number;//后摇时间/帧
+    private _curPoint:number = 0;//当前已积蓄的点数
+    private _velocity:number = 1;//当前累加速率(点数/帧)
+
+    public get ready():boolean{
+        return this._curPoint>=this._prepTime;
+    }
+
+    public tic():void{
+        this._curPoint += this._velocity;
+    }
+
+    public get coolComplete():boolean{
+        return this._curPoint < this._prepTime+this._coolTime;
+    }
+
+    public refresh():void{
+        this._curPoint = 0;
+    }
 
     /**
      * @param keeper 状态机所有者
@@ -151,7 +172,10 @@ export class AtkStateMachine {
         this.stateList.edit(StateType.AFTER_ATK, new AfterAtk());
         //todo: about res
 
-        this.seeker = null;//初始化Seeker
+        this._prepTime = 40;
+        this._coolTime = 40;
+
+        this.seeker = null;//初始化Seeker(根据res)
     }
 
     /**

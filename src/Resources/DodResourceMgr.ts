@@ -33,6 +33,7 @@ export default class DodResourceMgr {
         //this._json.load();
         //this._tex.load();
         //set inited flag true while initialization complete
+        this._inited = true;
     }
 
     public inited(): boolean {

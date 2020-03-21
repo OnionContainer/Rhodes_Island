@@ -9,6 +9,8 @@ export class ActorStateWalk extends ActorStateBase{
     }
     
     public update():void{
+
+        console.log("Walk update");
         let actor = this._actor;
 
         if (this._actor.transform.pos.arrived) {//已到达目的地

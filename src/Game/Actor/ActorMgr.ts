@@ -1,11 +1,16 @@
 import Actor from "./Actor";
 import { ActorType } from "../../Common/DodKey";
 import { ActorStateID } from "./State/ActorStateFsm";
+import { ColiReceiver } from "./ActorModules/ColiMessage";
+import RhodesGame from "../RhodesGame";
 
 export default class ActorMgr {
-    public actors: Array<Actor>;
+    public actors: Actor[];
+
+    public _matrix: Actor[][];
+
     constructor() {
-        this.actors = new Array<Actor>();
+        this.actors = [];
 
         //test
         this.createActor(ActorType.Monster, {});
@@ -25,10 +30,12 @@ export default class ActorMgr {
     }
 
     public update(): void {
+        console.log("Mgr update");
         for (let i = 0; i < this.actors.length; i++) {
             let actor = this.actors[i];
             actor.update();
         }
+        RhodesGame.Instance.battle.mapNodeCPU.render();
     }
 
     public reset(): void {

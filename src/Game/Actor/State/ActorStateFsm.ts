@@ -9,7 +9,8 @@ export enum ActorStateID {
     Prepared,     //待机 (未出动/未部署)  
     Born,   //出生动画 不可攻击 不可被攻击
     Walk,   //移动 敌人用
-    Stunned,    //晕眩 冰冻 etc
+    Stunned,    //晕眩 etc （打断动作的被控制状态）
+    Freezed,    //冰冻 （不打断动作的被控制状态）
     Fight,  //普攻状态 干员常态 敌人被阻挡后
     Death,  //死亡动画 不可攻击 不可被攻击
     Escape, //敌人逃脱

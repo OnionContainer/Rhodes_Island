@@ -24,6 +24,7 @@ export default class GameStateGameload extends GameStateBase{
 
     public update(): void {
         super.update();
+        console.log("GameLoad update");
         if (true == DodResourceMgr.Instance.inited()) {
             //WE DO NOT HAVE LOBBY MODULE IN THIS VERSION
             //JUST SET LEVEL ID HERE

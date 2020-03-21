@@ -13,6 +13,8 @@ export class ColiEmit{
     public static readonly GLOBAL_UNIT_HEIGHT:number = 100;//全局单位高
     public static readonly GLOBAL_UNIT_SUBWIDTH:number = 90;//全局内部单位宽
     public static readonly GLOBAL_UNIT_SUBHEIGHT:number = 90;//全局内部单位高
+    public static readonly GLOBAL_UNIT_RSHIFT:number = 5;//全局单位向右偏移
+    public static readonly GLOBAL_UNIT_BSHIFT:number = 5;//全局单位向下偏移
 
     private _rec:FixRect;
     

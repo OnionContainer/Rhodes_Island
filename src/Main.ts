@@ -58,6 +58,9 @@ class Main {
 
 		SceneManager.Instance.awake();
 		
+
+		//test
+		DodResourceMgr.Instance.init();
 		
 		//Awake Game Engine Loop
 		Laya.timer.loop(16, this, this._update);

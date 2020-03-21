@@ -3,13 +3,15 @@ import { ActorCollisionProcessor } from "./Collision/ActorCollisionProcessor";
 import GameLevel from "./GameLevel";
 import DodResourceMgr from "../Resources/DodResourceMgr";
 import ActorMgr from "./Actor/ActorMgr";
+import ColiReporter from "./Collision/ColiReporter";
 
 export default class GameBattle {
     public level: GameLevel;
     public map: GameMap;
     public actorMgr: ActorMgr;
 
-    public collision: ActorCollisionProcessor;
+    public collision: ActorCollisionProcessor;//负责圆形碰撞检测
+    public mapNodeCPU: ColiReporter = new ColiReporter();//负责地图节点碰撞检测
 
     private _levelPrepared: boolean;
 
@@ -24,6 +26,10 @@ export default class GameBattle {
     public prepareLevel(): void {
         //TODO init level information
         let res = DodResourceMgr.Instance.getCurrentLevelRes();
+
+        //test
+        res = {level:1,map:2};
+
         this.level.init(res['level']); //just sample
         this.map.init(res['map']);
         this.actorMgr.init(res['map']);

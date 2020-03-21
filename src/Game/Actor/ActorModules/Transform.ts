@@ -19,7 +19,7 @@ class Pos{
 
     
     public target:Vec2 = new Vec2(0,0);//目标
-    public speed:number = 0;//速度
+    public speed:number = 5;//速度
     public approach:number = 0;//逼近次数
     public vecSpeed:Vec2 = new Vec2(0,0);//分量速度
     private _arrived:boolean = true;//已到达目的地(每次设置新目的地时设为false)
