@@ -7,14 +7,14 @@ import RhodesGame from "../RhodesGame";
 export default class ActorMgr {
     public actors: Actor[];
 
-    public _matrix: Actor[][];
-
     constructor() {
         this.actors = [];
 
         //test
         this.createActor(ActorType.Monster, {});
         this.actors[0].state.runState(ActorStateID.Walk);
+        this.createActor(ActorType.Operator, {});
+        this.actors[1].state.runState(ActorStateID.Fight);
     }
 
     public init(res: any) {
@@ -30,7 +30,6 @@ export default class ActorMgr {
     }
 
     public update(): void {
-        console.log("Mgr update");
         for (let i = 0; i < this.actors.length; i++) {
             let actor = this.actors[i];
             actor.update();

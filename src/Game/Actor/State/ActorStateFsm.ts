@@ -3,6 +3,7 @@ import DodLog from "../../../Common/DodLog";
 import Actor from "../Actor";
 import { ActorStateWalk } from "./ActorStateWalk";
 import { ActorStatePrepared } from "./ActorStatePrepared";
+import { ActorStateFight } from "./ActorStateFight";
 
 export enum ActorStateID {
     None,
@@ -28,6 +29,7 @@ export default class ActorStateMgr {
         this._currentState = null;
         this._states[ActorStateID.Walk] = new ActorStateWalk(actor);
         this._states[ActorStateID.Prepared] = new ActorStatePrepared(actor);
+        this._states[ActorStateID.Fight] = new ActorStateFight(actor);
         //TODO
         //参照游戏大状态机
     }

@@ -1,5 +1,6 @@
 import Actor from "../Actor";
 import { DodMath, Vec2 } from "../../../Common/DodMath";
+import { ColiEmit } from "./ColiMessage";
 
 /**
  * 对一个单位的几何状态的描述
@@ -71,6 +72,11 @@ class Pos{
         this.data.y = this.data.y + this.vecSpeed.y;
         return;
     }
+
+    public getNodePos():Vec2{
+        return new Vec2(Math.floor(this.data.x / ColiEmit.GLOBAL_UNIT_WIDTH), Math.floor(this.data.y / ColiEmit.GLOBAL_UNIT_HEIGHT));
+    }
+
     constructor(){
 
     }

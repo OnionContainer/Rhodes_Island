@@ -59,13 +59,13 @@ export default class Actor implements Symbolized{
         this.type = type;
         this.state = new ActorStateMgr(this);
         // according to different type, add different components to this actor. 
-
+        this.transform = new Transform(this);
         this.profile = new Profile(this, res['xxx']); 
         this.atk = new AtkStateMachine(this, res['xxx']);
         this.blocker = new Blocker(this);
         
         this.buffMgr = new ActorBuffMgr(this, res['xxx']);
-        this.transform = new Transform(this);
+        
         this.render = new UnitRender(this);
         
         this.animation = new Animation(this, res['xxx']);

@@ -1,6 +1,7 @@
 import { Damage, DamageType } from "./Damage";
 import Actor from "../Actor";
 import { ActorType } from "../../../Common/DodKey";
+import { Vec2 } from "../../../Common/DodMath";
 
 
 /**
@@ -34,8 +35,13 @@ export class Profile {
         //todo: about res
     }
 
+    public getNodePos():Vec2{
+        return this.keeper.transform.pos.getNodePos();
+    }
+
     /**
      * 传入一个Actor，返回伤害对象
+     * 正在考虑废弃此项
      * @param source 
      */
     public generateDamage(source:Actor):Damage{

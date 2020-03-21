@@ -3,6 +3,7 @@ import { Seeker } from "./ActorSeeker";
 import { Vec2 } from "../../../Common/DodMath";
 import Actor from "../Actor";
 import RhodesGame from "../../RhodesGame";
+import { ArrayAlgo } from "../../../Common/DodDataStructure";
 
 /**
  * 此对象是一种可以被攻击状态机应用的Actor搜索器
@@ -24,7 +25,6 @@ export class MapNodeSeeker implements Seeker {
         this._relativeNodeList.forEach(ele=>{
             this._absoluteNodeList.push(this._origin.plus(ele));
         });
-
     }
 
     constructor(origin:Vec2, res:any, rotate:number = 0){
@@ -34,29 +34,56 @@ export class MapNodeSeeker implements Seeker {
         
         //test
         this._relativeNodeList.push(new Vec2(0,0), new Vec2(1,0), new Vec2(2,0));
+
+
         this.setAbsolute();
     }
 
 
-    getFocus(): Actor {
-        throw new Error("Method not implemented.");
+    public getFocus(): Actor {
+        return this._focus;
     }
-    getFocusList(count: number): Actor[] {
-        throw new Error("Method not implemented.");
+
+    public getFocusList(count: number): Actor[] {
+        //todo: 考虑在interface中移除此项
+        return null;
     }
-    getCaptureList(): Actor[] {
-        throw new Error("Method not implemented.");
+
+    public getCaptureList(): Actor[] {
+        return this._captureList;
     }
-    followActor(): Actor {
-        throw new Error("Method not implemented.");
+
+    public followActor(): Actor {
+        //todo: 考虑在interface中移除此项
+        return null;
     }
-    focusChanged(): boolean {
-        throw new Error("Method not implemented.");
+
+    public focusChanged(): boolean {
+        return this._focusChanged;
     }
-    update(): void {
+    
+    public update(): void {
+        //刷新捕捉列表
+        this._captureList = [];
+
         this._absoluteNodeList.forEach(ele=>{
             let list:Actor[] = RhodesGame.Instance.battle.mapNodeCPU.matrixGet(ele);
+            list.forEach(ele=>{
+                this._captureList.push(ele);
+            });
         });
+
+        this._captureList = ArrayAlgo.shrink(this._captureList);
         
+        //处理focus
+        if ( (this._focus == null || this._focus == undefined) && this._captureList.length > 0) {//当前无捕捉目标，且captureList中有目标
+            this._focus = this._captureList[0];
+            this._focusChanged = true;
+        } else if (this._captureList.indexOf(this._focus) == -1) {//当前捕捉目标不在captureList中
+            this._focus = this._captureList[0];
+            this._focusChanged = true;
+        } else {//捕捉目标未改变
+            this._focusChanged = false;
+        }
     }
 }

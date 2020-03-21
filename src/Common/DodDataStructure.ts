@@ -317,6 +317,24 @@ export class ArrayAlgo{
     }
 
     /**
+     * 输入一个数组，返回将重复元素删除后的新数组
+     * 不改动原数组
+     * 多个元素仅取首个
+     * @param list 
+     */
+    public static shrink(list:any[]):any[]{
+        let result = [];
+
+        list.forEach(ele=>{
+            if (result.indexOf(ele) == -1) {
+                result.push(ele);
+            }
+        });
+
+        return result;
+    }
+
+    /**
      * 求ele在arr中的index，若未找到则返回-1
      * ele必须实现comparable接口
      * @param ele 
