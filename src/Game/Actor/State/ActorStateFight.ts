@@ -11,5 +11,6 @@ export class ActorStateFight extends ActorStateBase{
 
         */
        this._actor.atk.update();
+       this._actor.blocker.update();
     }
 }

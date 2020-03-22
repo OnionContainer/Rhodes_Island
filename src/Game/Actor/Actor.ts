@@ -14,6 +14,8 @@ import Route from "./ActorRoute";
 import { ActorSkill } from "./ActorModules/ActorSkill";
 import { ActorCost } from "./ActorModules/ActorCost";
 import { Blocker } from "./Attack/Blocker";
+import { Vec2 } from "../../Common/DodMath";
+import GameBattle from "../GameBattle";
 
 
 
@@ -52,7 +54,6 @@ export default class Actor implements Symbolized{
 
     
     constructor(type: ActorType, res: any) {
-
         res['xxx'] = 1145141919810;
 
         this.symbol = new MySymbol();
@@ -62,7 +63,7 @@ export default class Actor implements Symbolized{
         this.transform = new Transform(this);
         this.profile = new Profile(this, res['xxx']); 
         this.atk = new AtkStateMachine(this, res['xxx']);
-        this.blocker = new Blocker(this);
+        this.blocker = new Blocker(this, res['xxx']);
         
         this.buffMgr = new ActorBuffMgr(this, res['xxx']);
         
@@ -127,19 +128,7 @@ export default class Actor implements Symbolized{
         //（可能）发出死亡事件
     }
     
-    /**
-     * 移除buff
-     * @param buff 
-     * 接口移除
-     */
-    // public removeBuff(buff:Buff):void{
-    //     let i:number = this.buffList.indexOf(buff);
-    //     if (i == -1) {
-    //         return;
-    //     }
-    //     this.buffList[i].onDestroy();
-    //     this.buffList.splice(i,1);
-    // }
+
 }
 
 

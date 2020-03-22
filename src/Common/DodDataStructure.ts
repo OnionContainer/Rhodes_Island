@@ -312,6 +312,27 @@ export class ArrayAlgo{
         return result;
     }
 
+    /**
+     * 返回一个集合c，且使得它具有如下性质：
+     * 对于每个存在于集合a中的元素，如果它不在集合b中，则它在集合c中
+     * 即c=a-b
+     * 
+     * 注意：目前如果a中存在两个元素K，b中存在一个元素K，结果中的c不会存在元素K
+     * 只要b中存在一个就会把a里的全部减掉
+     * @param a 
+     * @param b 
+     */
+    public static findCompSet(a:any[], b:any[]):any[] {
+        let result:Comparable[] = [];
+        for (let ele of a) {
+            if (b.indexOf(a) === -1) {
+                result.push(ele);
+            }
+        };
+        //求相对补集a-b
+        return result;
+    }
+
     public static findIntersectionSet(a:Comparable[], b:Comparable[]){
         //求交集a∩b
     }

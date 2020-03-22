@@ -14,10 +14,7 @@ export class Profile {
 
     private _prepTime: number = 100;//前摇时间
     private _afterTime: number = 100;//后摇时间
-    private _breakthrough: number = 1;//破除阻挡能力
     public invisible: boolean = false;//是否隐形
-    public blocked: boolean = false;//已被阻挡
-    public blocker: Actor;//阻挡者
 
     /**
      * 伤害计算相关的修改和访问接口
@@ -66,8 +63,9 @@ export class Profile {
         return this._afterTime;
     }
 
-    public get breakthrough(): number {
-        return this._breakthrough;
+    public get blockable(): boolean{
+        //todo: 判断是否可以被阻挡
+        return true;
     }
 
    

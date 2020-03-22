@@ -11,10 +11,21 @@ export default class ActorMgr {
         this.actors = [];
 
         //test
+        let creatEnemy:Function = (time:number[])=>{
+            time.forEach(ele=>{
+                Laya.timer.once(ele, this, ()=>{
+                    let index = this.actors.length;
+                    this.createActor(ActorType.Monster, {});
+                    this.actors[index].state.runState(ActorStateID.Walk);
+                });
+            });
+        }
+
         this.createActor(ActorType.Monster, {});
         this.actors[0].state.runState(ActorStateID.Walk);
         this.createActor(ActorType.Operator, {});
         this.actors[1].state.runState(ActorStateID.Fight);
+        creatEnemy([300,600,900]);
     }
 
     public init(res: any) {
