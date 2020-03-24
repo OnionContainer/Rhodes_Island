@@ -95,7 +95,15 @@ export default class Actor implements Symbolized{
         // this.render.reset();
     }
 
-    public setOnMap(): void {
+    /**
+     * 将此对象设置到场上
+     */
+    public setOnMap(pos:Vec2): void {
+        //todo: 启动模块
+        this.atk.start(pos);
+        this.transform.start(pos);
+        
+        this.state.runState(ActorStateID.Born);
         //TODO
     }
 

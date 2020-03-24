@@ -8,6 +8,7 @@ import PerformanceCentre from "./Common/Graphics/Performance_Module/PerformanceC
 import { Vec2 } from "./Common/DodMath";
 import Actor from "./Game/Actor/Actor";
 import { ActorType } from "./Common/DodKey";
+import { Symbolized, MySymbol } from "./Fix/FixSymbol";
 
 class Main {
 	constructor() {
@@ -36,6 +37,16 @@ class Main {
 			[0,0,0,0],
 			[0,0,0,0]
 		], new Vec2(50,50), new Vec2(100,100), "#ff00ff", "#ffff00");
+
+		let k = new class implements Symbolized {
+			symbol: MySymbol = new MySymbol();
+		}
+
+		PerformanceCentre.instance.displayActor(k, new Vec2(50,50), new Vec2(50,50));
+
+		console.log(PerformanceCentre.instance);
+		console.log(k);
+
 		//test end
 
 		FixTime.init();

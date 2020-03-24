@@ -3,6 +3,7 @@ import { ActorType } from "../../Common/DodKey";
 import { ActorStateID } from "./State/ActorStateFsm";
 import { ColiReceiver } from "./ActorModules/ColiMessage";
 import RhodesGame from "../RhodesGame";
+import { Vec2 } from "../../Common/DodMath";
 
 export default class ActorMgr {
     public actors: Actor[];
@@ -24,7 +25,7 @@ export default class ActorMgr {
         this.createActor(ActorType.Monster, {});
         this.actors[0].state.runState(ActorStateID.Walk);
         this.createActor(ActorType.Operator, {});
-        this.actors[1].state.runState(ActorStateID.Fight);
+        this.actors[1].state.runState(ActorStateID.Prepared);
         creatEnemy([300,600,900]);
     }
 
@@ -68,6 +69,26 @@ export default class ActorMgr {
             }
         }
         return null;
+    }
+
+    public deployOprt(id:number, pos:Vec2):void{
+        let oprt:Actor = this.getActorByID(id);
+
+        if (oprt == null) {
+            throw new DOMException("Deploting None Existing Operator");
+        }
+
+        if (oprt.state.currentStateType != ActorStateID.Prepared) {
+            throw new DOMException("Deploying None Prepared Operator");
+        }
+
+        if (oprt.type != ActorType.Operator) {
+            throw new DOMException("Deploying None Operator Actor");
+        }
+
+        oprt.setOnMap(pos);
+        oprt.state.runState(ActorStateID.Born);
+
     }
 
     private _initEnemy(res: any) {

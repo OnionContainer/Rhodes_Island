@@ -5,6 +5,7 @@ import { Seeker } from "./ActorSeeker";
 import FixTime from "../../../Fix/FixTime";
 import { MapNodeSeeker } from "./MapNodeSeeker";
 import { Vec2 } from "../../../Common/DodMath";
+import { DeployInterestedModule } from "../ActorModules/ModuleInterface";
 
 
 /**
@@ -118,7 +119,7 @@ class AfterAtk extends BaseState {
 /**
  * 状态机类
  */
-export class AtkStateMachine {
+export class AtkStateMachine implements DeployInterestedModule{
     /*
     * 所属Actor
     * */
@@ -170,7 +171,20 @@ export class AtkStateMachine {
         this._coolTime = 300;
 
         this.seeker = new MapNodeSeeker(this.keeper.profile.getNodePos().plus(new Vec2(3,3)), res['xxx'], 0);
+
     }
+
+    public start(pos:Vec2):void{
+        this.isWorking = ()=>{return true};
+        this.seeker.reposition(pos);
+    }
+
+    public terminate():void{
+        this.isWorking = ()=>{return false};
+
+    }
+
+    public isWorking():boolean{return false;}
 
     /**
      * 刷新当前状态，每帧调用

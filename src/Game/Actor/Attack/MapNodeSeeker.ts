@@ -25,6 +25,7 @@ export class MapNodeSeeker implements Seeker {
         this._relativeNodeList.forEach(ele=>{
             this._absoluteNodeList.push(this._origin.plus(ele));
         });
+        // this.update();
     }
 
     constructor(origin:Vec2, res:any, rotate:number = 0){
@@ -36,6 +37,11 @@ export class MapNodeSeeker implements Seeker {
         this._relativeNodeList.push(new Vec2(0,0), new Vec2(1,0), new Vec2(2,0));
 
 
+        this.setAbsolute();
+    }
+
+    public reposition(pos:Vec2):void{
+        this._origin = pos;
         this.setAbsolute();
     }
 
@@ -74,6 +80,9 @@ export class MapNodeSeeker implements Seeker {
         });
 
         this._captureList = ArrayAlgo.shrink(this._captureList);
+        this._captureList = this._captureList.filter(ele=>{
+            return ele.type == ActorType.Monster;
+        });
         
         //处理focus
         if ( (this._focus == null || this._focus == undefined) && this._captureList.length > 0) {//当前无捕捉目标，且captureList中有目标

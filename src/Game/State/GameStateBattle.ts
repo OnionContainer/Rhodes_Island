@@ -21,6 +21,7 @@ export default class GameStateBattle extends GameStateBase{
 
     public update(): void {
         super.update();
+        this._battle.collision.update();
         this._battle.actorMgr.update();
         this._battle.map.update();
     }

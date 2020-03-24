@@ -1,11 +1,26 @@
 import Actor from "../Actor";
 import { DodMath, Vec2 } from "../../../Common/DodMath";
 import { ColiEmit } from "./ColiMessage";
+import { DeployInterestedModule } from "./ModuleInterface";
 
 /**
  * 对一个单位的几何状态的描述
  */
-export class Transform{
+export class Transform implements DeployInterestedModule{
+
+    start(pos: Vec2): void {
+        this.isWorking = ()=>{return true};
+        this.pos.setNodePos(pos);
+    }
+
+    terminate(): void {
+        this.isWorking = ()=>{return false};
+    }
+
+    isWorking(): boolean {
+        return false;
+    }
+
     public pos:Pos = new Pos();
     
     constructor(keeper:Actor){
@@ -75,6 +90,14 @@ class Pos{
 
     public getNodePos():Vec2{
         return new Vec2(Math.floor(this.data.x / ColiEmit.GLOBAL_UNIT_WIDTH), Math.floor(this.data.y / ColiEmit.GLOBAL_UNIT_HEIGHT));
+    }
+
+    /**
+     * 依据地图节点设置位置
+     * @param pos 此处的Vec2实例储存的是整数数据，用于描述地图节点位置
+     */
+    public setNodePos(pos:Vec2):void{
+        this.data = new Vec2(pos.x * ColiEmit.GLOBAL_UNIT_WIDTH, pos.y * ColiEmit.GLOBAL_UNIT_HEIGHT);
     }
 
     constructor(){

@@ -13,22 +13,22 @@ import {CircleCollisionRange} from "./CollisionRange";
  */
 export class ActorCollisionProcessor {
 
-    private colliderMap: { [key: number]: ActorCollider } = {};
+    private _colliderMap: { [key: number]: ActorCollider } = {};
 
     public registerCollider(collider: ActorCollider) {
-        this.colliderMap[collider.symbol.data] = collider;
+        this._colliderMap[collider.symbol.data] = collider;
     }
 
     public unregisterCollider(collider: ActorCollider) {
-        delete this.colliderMap[collider.symbol.data];
+        delete this._colliderMap[collider.symbol.data];
     }
 
     public update() {
-        for (let i in this.colliderMap) {
-            let targetCollider = this.colliderMap[i];
+        for (let i in this._colliderMap) {
+            let targetCollider = this._colliderMap[i];
             let collidingList = [];
-            for (let j in this.colliderMap) {
-                let collider = this.colliderMap[j];
+            for (let j in this._colliderMap) {
+                let collider = this._colliderMap[j];
                 if (collider == targetCollider) {
                     continue;
                 }

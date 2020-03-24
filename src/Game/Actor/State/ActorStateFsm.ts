@@ -4,6 +4,7 @@ import Actor from "../Actor";
 import { ActorStateWalk } from "./ActorStateWalk";
 import { ActorStatePrepared } from "./ActorStatePrepared";
 import { ActorStateFight } from "./ActorStateFight";
+import { ActorStateBorn } from "./ActorStateBorn";
 
 export enum ActorStateID {
     None,
@@ -24,12 +25,18 @@ export enum ActorStateID {
 export default class ActorStateMgr {
     private _states: ActorStateBase[] = [];
     private _currentState: ActorStateBase;
+    private _currentStateType: ActorStateID = ActorStateID.None;
+
+    public get currentStateType(): ActorStateID{
+        return this._currentStateType;
+    }
 
     constructor(actor: Actor) {
         this._currentState = null;
         this._states[ActorStateID.Walk] = new ActorStateWalk(actor);
         this._states[ActorStateID.Prepared] = new ActorStatePrepared(actor);
         this._states[ActorStateID.Fight] = new ActorStateFight(actor);
+        this._states[ActorStateID.Born] = new ActorStateBorn(actor);
         //TODO
         //参照游戏大状态机
     }
@@ -48,6 +55,7 @@ export default class ActorStateMgr {
             this._currentState.leave();
         }
 
+        this._currentStateType = stateID;
         this._currentState = this._states[stateID];
         this._currentState.enter();
     }

@@ -1,4 +1,5 @@
 import Actor from "../Actor";
+import { Vec2 } from "../../../Common/DodMath";
 
 export interface Seeker {
     /**
@@ -26,5 +27,10 @@ export interface Seeker {
     focusChanged():boolean
 
     update():void
+
+    /**
+     * 重设中心点位置
+     */
+    reposition(pos:Vec2):void
 }
 

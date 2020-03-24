@@ -4,6 +4,7 @@ import GameLevel from "./GameLevel";
 import DodResourceMgr from "../Resources/DodResourceMgr";
 import ActorMgr from "./Actor/ActorMgr";
 import ColiReporter from "./Collision/ColiReporter";
+import GameUIEvent from "./GameUIEvent";
 
 export default class GameBattle {
     public level: GameLevel;
@@ -13,6 +14,8 @@ export default class GameBattle {
     public collision: ActorCollisionProcessor;//负责圆形碰撞检测
     public mapNodeCPU: ColiReporter = new ColiReporter();//负责地图节点碰撞检测
 
+    public gameUIEvent:GameUIEvent;
+
     private _levelPrepared: boolean;
 
     constructor() {
@@ -21,6 +24,7 @@ export default class GameBattle {
         this.actorMgr = new ActorMgr();
 
         this.collision = new ActorCollisionProcessor();
+        this.gameUIEvent = new GameUIEvent();
     }
 
     public prepareLevel(): void {
