@@ -117,16 +117,10 @@ export default class PerformanceCentre implements Renderer{
     /**
      * 销毁对象（默认销毁）
      * @param bound 对象
-     * @param pos 坐标（一律按全局缩放比为1计算，渲染器会根据全局缩放比自动完成缩放渲染）
      */
-    public distroyActor(bound: Symbolized, pos?: Vec2): void {
+    public distroyActor(bound: Symbolized): void {
         let tmpActor:ActorRU = ActorBox.get(bound.symbol.data);//获取actorRU对象
-        if(pos === undefined){
-            tmpActor.destory();
-        }
-        if(pos.equals(tmpActor.getPosVec())){
-            tmpActor.destory();
-        }
+        tmpActor.destory();
         //销毁actorRU对象
     }
 
