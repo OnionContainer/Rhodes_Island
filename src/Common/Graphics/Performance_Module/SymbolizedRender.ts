@@ -29,7 +29,7 @@ export default class ActorRU{
     private _fist:CustomizedSprite;//攻击特效显示节点
     private _movePercentage:number = 0;//攻击特效参数暂存器
     public _centerPos:Vec2;//中心坐标
-
+    private _ani:Laya.Animation;
 
     /**
      * RenderUnit构造器
@@ -69,6 +69,43 @@ export default class ActorRU{
         
 
     }
+public clearAni():void{
+        this._ani.clear();
+    }
+
+
+    
+
+    public loadAni(name:string,status:string, loopOrNot:boolean = false):Laya.Animation{
+        this._ani = new Laya.Animation();
+        this._ani.pos(-17*this._scale,-8*this._scale);
+        this._ani.scale(0.25*this._scale,0.18*this._scale);
+        this._spr.addChild(this._ani);
+        this._ani.loadAtlas(`res/atlas/${name}.atlas`,Laya.Handler.create(this,onLoaded)); 
+        
+        this._ani.play(undefined,loopOrNot);
+
+        function createAniUrls(url,length){
+            let urls = [];
+            for(let i=1;i<length;i++){
+                if(i < 10){
+                    urls.push(url +"_"+"0" +i+".png");
+                }else{
+                    urls.push(url +"_"+i+".png");  
+                }
+                
+            }
+            return urls;
+        }
+        function onLoaded(){
+            
+            this._ani.interval = 50;
+            let tmpAni = createAniUrls(`${name}/${status}`,16);
+            this._ani.loadImages(tmpAni);
+            
+        }
+        return this._ani;
+    }
 
     /**
      * 返回当前可视节点坐标
@@ -93,6 +130,7 @@ export default class ActorRU{
                 // this._fist.graphics.restore();
                 Laya.timer.clear(this,fun);
                 ActorBox.get(to.symbol.data).damage();
+	this._ani.stop();
                 return;
     
             }
@@ -168,6 +206,8 @@ export default class ActorRU{
         this.setColor();
         this._damage.setParam(0,0,this._initSize.x*this._scale,this._initSize.y*this._scale);
         this._damage.locationAndSize();
+        this._ani.scale(0.25*value,0.18*value);
+        this._ani.pos(-17*value,-8*value);
         
 
     }

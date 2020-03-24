@@ -52,9 +52,8 @@ export interface Renderer{
     /**
      * 摧毁一个Actor可视单元
      * @param bound 
-     * @param pos 
      */
-    distroyActor(bound:Symbolized, pos?:Vec2):void
+    distroyActor(bound:Symbolized):void
 
     /**
      * 在一个可视单元上写一些字

@@ -64,6 +64,7 @@ export default class PerformanceCentre implements Renderer{
      */
     public displayActor(bound: Symbolized, pos: Vec2, siz:Vec2 = new Vec2(10,10), color:string = "#00ff00", father:CustomizedSprite = PerformanceCentre.instance.chessBoard): void {
         let tmpActor:ActorRU = new ActorRU(bound.symbol,pos,siz,father,color);//渲染actor
+	tmpActor.loadAni("angel_normal","start");
     }
     
     /**
@@ -95,6 +96,8 @@ export default class PerformanceCentre implements Renderer{
      * @param to 遭受打击节点
      */
     public defaultAtkEffect(from: Symbolized, to: Symbolized): void {
+        ActorBox.get(from.symbol.data).clearAni();
+        ActorBox.get(from.symbol.data).loadAni("angel_normal","attack",true);
         //打击事件、发动攻击节点和遭受攻击节点参数
         ActorBox.get(from.symbol.data).hit(to);
         
@@ -114,16 +117,10 @@ export default class PerformanceCentre implements Renderer{
     /**
      * 销毁对象（默认销毁）
      * @param bound 对象
-     * @param pos 坐标（一律按全局缩放比为1计算，渲染器会根据全局缩放比自动完成缩放渲染）
      */
-    public distroyActor(bound: Symbolized, pos?: Vec2): void {
+    public distroyActor(bound: Symbolized): void {
         let tmpActor:ActorRU = ActorBox.get(bound.symbol.data);//获取actorRU对象
-        if(pos === undefined){
-            tmpActor.destory();
-        }
-        if(pos.equals(tmpActor.getPosVec())){
-            tmpActor.destory();
-        }
+        tmpActor.destory();
         //销毁actorRU对象
     }
 
