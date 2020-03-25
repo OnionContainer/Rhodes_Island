@@ -2,7 +2,7 @@ import {KVPair} from "../../../Common/DodDataStructure";
 import Actor from "../Actor";
 import {EventCentre} from "../../../Event/EventCentre";
 import { Seeker } from "./ActorSeeker";
-import FixTime from "../../../Fix/FixTime";
+import FixTime, { DodTimer } from "../../../Fix/FixTime";
 import { MapNodeSeeker } from "./MapNodeSeeker";
 import { Vec2 } from "../../../Common/DodMath";
 import { DeployInterestedModule } from "../ActorModules/ModuleInterface";
@@ -55,6 +55,8 @@ class Wait extends BaseState {
         const focus = machine.seeker.getFocus();
         if (focus != null && focus != undefined) {//如果能够找到敌人
             machine.changeState(StateType.PREPARE);
+            machine.prepTimer.reset();
+            machine.coolTimer.reset();
             console.log("Found Enemy");
         } else {//如果找不到敌人
             //todo: none
@@ -77,9 +79,9 @@ class Prepare extends BaseState {
         // console.log(seeker.focusChanged);
         if (seeker.focusChanged()) {//当前目标已修改
             // console.log("prepare:Focuschanged");
-            machine.refresh();
+            machine.prepTimer.reset();
             if (seeker.getFocus() != null) {
-                machine.refresh();
+                // machine.refresh();
             } else {
                 machine.changeState(StateType.WAIT);
             }
@@ -89,11 +91,11 @@ class Prepare extends BaseState {
         }
 
         //当前目标未修改
-        machine.tic();
-        if (machine.ready) {
+        if (machine.prepTimer.ready) {
             //todo: 进行攻击(进行profile参数判断)
             machine.keeper.attack(seeker.getFocus());
             machine.changeState(StateType.AFTER_ATK);//转换到后摇
+            machine.coolTimer.reset();
             console.log("Attack Happened");
         }
 
@@ -103,9 +105,11 @@ class Prepare extends BaseState {
 class AfterAtk extends BaseState {
     public name():string{return "AfterState";}
     public execute(machine: AtkStateMachine): void {
-        machine.tic();
-        if (machine.coolComplete) {
-            machine.refresh();
+        // machine.tic();
+        if (machine.coolTimer.ready) {
+            // machine.refresh();
+            machine.coolTimer.reset();
+            machine.prepTimer.reset();
             if (machine.seeker.getFocus() != null) {
                 machine.changeState(StateType.PREPARE);
             } else {
@@ -120,6 +124,9 @@ class AfterAtk extends BaseState {
  * 状态机类
  */
 export class AtkStateMachine implements DeployInterestedModule{
+    删函数(): void {
+        throw new Error("Method not implemented.");
+    }
     /*
     * 所属Actor
     * */
@@ -135,26 +142,28 @@ export class AtkStateMachine implements DeployInterestedModule{
 
     public seeker: Seeker;
 
-    private _prepTime:number;//前摇时间/帧
-    private _coolTime:number;//后摇时间/帧
-    private _curPoint:number = 0;//当前已积蓄的点数
-    private _velocity:number = 1;//当前累加速率(点数/帧)
+    private _prepTime:number;//前摇时间/秒
+    private _coolTime:number;//后摇时间/秒
+    public prepTimer:DodTimer;
+    public coolTimer:DodTimer;
+    // private _curPoint:number = 0;//当前已积蓄的点数
+    // private _velocity:number = 1;//当前累加速率(点数/帧)
 
-    public get ready():boolean{
-        return this._curPoint >= this._prepTime;
-    }
+    // public get ready():boolean{
+    //     return this._curPoint >= this._prepTime;
+    // }
 
-    public tic():void{
-        this._curPoint += this._velocity;
-    }
+    // public tic():void{
+    //     this._curPoint += this._velocity;
+    // }
 
-    public get coolComplete():boolean{
-        return this._curPoint >= this._prepTime+this._coolTime;
-    }
+    // public get coolComplete():boolean{
+    //     return this._curPoint >= this._prepTime+this._coolTime;
+    // }
 
-    public refresh():void{
-        this._curPoint = 0;
-    }
+    // public refresh():void{
+    //     this._curPoint = 0;
+    // }
 
     /**
      * @param keeper 状态机所有者
@@ -167,24 +176,17 @@ export class AtkStateMachine implements DeployInterestedModule{
         this.stateList.edit(StateType.AFTER_ATK, new AfterAtk());
         //todo: about res
 
-        this._prepTime = 300;
-        this._coolTime = 300;
+        this._prepTime = 3;
+        this._coolTime = 3;
+        this.prepTimer = new DodTimer(this._prepTime);
+        this.coolTimer = new DodTimer(this._coolTime);
 
         this.seeker = new MapNodeSeeker(this.keeper.profile.getNodePos().plus(new Vec2(3,3)), res['xxx'], 0);
-
     }
 
-    public start(pos:Vec2):void{
-        this.isWorking = ()=>{return true};
+    public onDeploy(pos:Vec2):void{
         this.seeker.reposition(pos);
     }
-
-    public terminate():void{
-        this.isWorking = ()=>{return false};
-
-    }
-
-    public isWorking():boolean{return false;}
 
     /**
      * 刷新当前状态，每帧调用

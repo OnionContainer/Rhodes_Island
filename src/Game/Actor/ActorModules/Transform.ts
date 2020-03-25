@@ -8,18 +8,14 @@ import { DeployInterestedModule } from "./ModuleInterface";
  */
 export class Transform implements DeployInterestedModule{
 
-    start(pos: Vec2): void {
-        this.isWorking = ()=>{return true};
+    删函数(): void {
+        throw new Error("Method not implemented.");
+    }
+    onDeploy(pos: Vec2): void {
         this.pos.setNodePos(pos);
     }
 
-    terminate(): void {
-        this.isWorking = ()=>{return false};
-    }
 
-    isWorking(): boolean {
-        return false;
-    }
 
     public pos:Pos = new Pos();
     

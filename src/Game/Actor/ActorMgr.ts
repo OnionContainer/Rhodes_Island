@@ -4,9 +4,12 @@ import { ActorStateID } from "./State/ActorStateFsm";
 import { ColiReceiver } from "./ActorModules/ColiMessage";
 import RhodesGame from "../RhodesGame";
 import { Vec2 } from "../../Common/DodMath";
+import GameUIEvent from "../GameUIEvent";
 
 export default class ActorMgr {
+
     public actors: Actor[];
+    public sideBar: Actor[]=[];
 
     constructor() {
         this.actors = [];
@@ -23,10 +26,11 @@ export default class ActorMgr {
         }
 
         this.createActor(ActorType.Monster, {});
-        this.actors[0].state.runState(ActorStateID.Walk);
+        // this.actors[0].state.runState(ActorStateID.Walk);
         this.createActor(ActorType.Operator, {});
-        this.actors[1].state.runState(ActorStateID.Prepared);
-        creatEnemy([300,600,900]);
+        this.actors[1].awake();
+        GameUIEvent.fuck = this.actors[1].symbol.data;
+        // creatEnemy([300,600,900]);
     }
 
     public init(res: any) {
@@ -59,6 +63,9 @@ export default class ActorMgr {
     public createActor(type: ActorType, res: any): void {
         let actor = new Actor(type, res);
         this.actors.push(actor);
+        if (type == ActorType.Operator) {
+            this.sideBar.push(actor);
+        }
     }
 
     public getActorByID(ID: number): Actor | null {
@@ -87,7 +94,6 @@ export default class ActorMgr {
         }
 
         oprt.setOnMap(pos);
-        oprt.state.runState(ActorStateID.Born);
 
     }
 
@@ -108,3 +114,4 @@ export default class ActorMgr {
         //}
     }
 }
+

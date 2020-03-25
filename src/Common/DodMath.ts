@@ -133,6 +133,23 @@ export class Vec2 implements Comparable{
         this.x = x;
         this.y = y;
     }
+
+    /**
+     * 将这个坐标吸附到scale为单位长度的平面空间内最近的左上角一点
+     * 例如：(310,278)在以100为单位长度吸附后会变为(3,2)
+     * @param scaleX 
+     */
+    public adsorp(scaleX:number, scaleY?:number):Vec2{
+
+        if (scaleY == null) {
+            scaleY = scaleX;
+        }
+
+        const x = Math.floor(this.x/scaleX);
+        const y = Math.floor(this.y/scaleY);
+
+        return new Vec2(x,y)
+    }
 }
 
 

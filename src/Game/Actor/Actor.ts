@@ -100,8 +100,8 @@ export default class Actor implements Symbolized{
      */
     public setOnMap(pos:Vec2): void {
         //todo: 启动模块
-        this.atk.start(pos);
-        this.transform.start(pos);
+        this.atk.onDeploy(pos);
+        this.transform.onDeploy(pos);
         
         this.state.runState(ActorStateID.Born);
         //TODO

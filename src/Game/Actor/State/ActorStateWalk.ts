@@ -21,6 +21,9 @@ export class ActorStateWalk extends ActorStateBase{
         }
         
         let 你不要过来啊:boolean = true;
+        if (1==1) {
+            return;
+        }
 
         if (this._actor.transform.pos.arrived && 你不要过来啊) {//已到达目的地
             if (actor.route.next()) {//存在下一个目标节点

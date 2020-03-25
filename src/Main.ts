@@ -35,17 +35,26 @@ class Main {
 		//test
 		PerformanceCentre.instance.initBoard([
 			[0,0,0,0],
+			[0,0,0,0],
+			[0,0,0,0],
 			[0,0,0,0]
 		], new Vec2(50,50), new Vec2(100,100), "#ff00ff", "#ffff00");
 
-		let k = new class implements Symbolized {
+		PerformanceCentre.instance.displayActor(new class implements Symbolized {
 			symbol: MySymbol = new MySymbol();
-		}
+		}, new Vec2(10000,10000), new Vec2())
+		//Bug Temp Fix
+		//todo: 告诉李哥点击事件bug
 
-		PerformanceCentre.instance.displayActor(k, new Vec2(50,50), new Vec2(50,50));
+		// let k = new class implements Symbolized {
+		// 	symbol: MySymbol = new MySymbol();
+		// }
 
-		console.log(PerformanceCentre.instance);
-		console.log(k);
+		// PerformanceCentre.instance.displayActor(k, new Vec2(50,50), new Vec2(50,50));
+		
+
+		// console.log(PerformanceCentre.instance);
+		// console.log(k);
 
 		//test end
 

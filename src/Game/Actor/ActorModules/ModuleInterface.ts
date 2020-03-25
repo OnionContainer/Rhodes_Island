@@ -11,15 +11,18 @@ export interface DeployInterestedModule{
     /**
      * 启动函数
      */
-    start(pos:Vec2):void
+    onDeploy(pos:Vec2):void
 
-    /**
-     * 停用函数
-     */
-    terminate():void
+    删函数():void
 
-    /**
-     * 返回是否已启动
-     */
-    isWorking():boolean
+}
+
+/**
+ * 对Actor的攻击行为敏感的模块
+ */
+export interface AttackInterestedModule{
+
+    beforeAtk():void
+
+    afterAtk():void
 }
