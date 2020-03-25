@@ -29,6 +29,9 @@ export default class ActorRU{
     private _fist:CustomizedSprite;//攻击特效显示节点
     private _movePercentage:number = 0;//攻击特效参数暂存器
     public _centerPos:Vec2;//中心坐标
+    this.addExtraButtonAtNoDefLocation(" ",99,undefined,new Vec2(1,1),new Vec2(1,1),color);
+    this.getButton(99).getSpr().zOrder = 0;
+    this._spr.addChild(this.getButton(99).getSpr());
     private _ani:Laya.Animation;
 
     /**
@@ -65,7 +68,7 @@ export default class ActorRU{
         this._fist.locationAndSize();//
         this._fist.zOrder = 2;//
         this._spr.addChild(this._fist);//
-        
+        this._ani = new Laya.Animation();
         
 
     }
@@ -77,7 +80,7 @@ public clearAni():void{
     
 
     public loadAni(name:string,status:string, loopOrNot:boolean = false):Laya.Animation{
-        this._ani = new Laya.Animation();
+        
         this._ani.pos(-17*this._scale,-8*this._scale);
         this._ani.scale(0.25*this._scale,0.18*this._scale);
         this._spr.addChild(this._ani);
@@ -130,7 +133,7 @@ public clearAni():void{
                 // this._fist.graphics.restore();
                 Laya.timer.clear(this,fun);
                 ActorBox.get(to.symbol.data).damage();
-	this._ani.stop();
+	//this._ani.stop();
                 return;
     
             }
@@ -206,8 +209,8 @@ public clearAni():void{
         this.setColor();
         this._damage.setParam(0,0,this._initSize.x*this._scale,this._initSize.y*this._scale);
         this._damage.locationAndSize();
-        this._ani.scale(0.25*value,0.18*value);
-        this._ani.pos(-17*value,-8*value);
+        //this._ani.scale(0.25*value,0.18*value);
+        //this._ani.pos(-17*value,-8*value);
         
 
     }

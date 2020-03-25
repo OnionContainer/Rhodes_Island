@@ -178,4 +178,18 @@ export default class PerformanceCentre implements Renderer{
         }
     }
 
+    /**
+     * 渲染动画
+     * 代号请查询动画对照表.xlsx
+     * @param bound 待渲染对象
+     * @param name 干员或敌人代号
+     * @param ani 动作代号
+     * @param loopOrNot 是否开启动作帧循环（默认关闭）
+     */
+    public displayAni(bound: Symbolized, name: string, ani: string , loopOrNot:boolean = false): void {
+        let tmpActor:ActorRU = ActorBox.get(bound.symbol.data);//获取待渲染ARU
+        tmpActor.clearAni();//清理动作
+        tmpActor.loadAni(name,ani,loopOrNot);//加载动作
+    }
+
 }

@@ -91,4 +91,12 @@ export interface Renderer{
      * @param color 颜色（要有默认颜色，而且要针对默认位置多次添加默认颜色做优化）
      */
     attachButton(bound:Symbolized,num:number, callback:Function, text?:string, pos?:Vec2, size?:Vec2, color?:string):void
+
+    /**
+     * 
+     * @param bound 
+     * @param name 
+     * @param ani 
+     */
+    displayAni(bound:Symbolized,name:string,ani:string,loopOrNot:boolean):void
 }
