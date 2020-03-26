@@ -29,9 +29,6 @@ export default class ActorRU{
     private _fist:CustomizedSprite;//攻击特效显示节点
     private _movePercentage:number = 0;//攻击特效参数暂存器
     public _centerPos:Vec2;//中心坐标
-    this.addExtraButtonAtNoDefLocation(" ",99,undefined,new Vec2(1,1),new Vec2(1,1),color);
-    this.getButton(99).getSpr().zOrder = 0;
-    this._spr.addChild(this.getButton(99).getSpr());
     private _ani:Laya.Animation;
 
     /**

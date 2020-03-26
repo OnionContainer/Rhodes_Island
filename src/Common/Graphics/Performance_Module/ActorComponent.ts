@@ -248,7 +248,7 @@ export class Text extends Laya.Text{
         if(this._switch === true){
             
             this._switch = false;
-            this.changeText("");
+            this.changeText(" ");
             
         }else{
             this._switch = true;
