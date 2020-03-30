@@ -2,6 +2,8 @@
 import CustomizedSprite from "./customizedSpr";
 import { Vec2 } from "../../DodMath";
 import { EventCentre } from "../../../Event/EventCentre";
+import { Symbolized } from "../../../Fix/FixSymbol";
+import { KVPair } from "../../DodDataStructure";
 
 
 export class ChessBoard extends CustomizedSprite{
@@ -14,6 +16,7 @@ export class ChessBoard extends CustomizedSprite{
     private _scale:number;//scale for zooming
     private _backGroundColor:string;//background color
     private _frontColor:string;//front color 
+    private _initboardsize:Vec2;
 
     /**
      * 棋盘构造器
@@ -126,6 +129,82 @@ export class ChessBoard extends CustomizedSprite{
         this.changeColor();
         this.renderFrontSpr(this._frontColor);
     }
+    public returnMouseVec():Vec2{
+        return new Vec2(this.mouseX,this.mouseY);
+    }
+
+    public getUnitSize():Vec2{
+        return this._initSize;
+    }
+
+    public getboardsize():Vec2{
+        return this._initboardsize;
+    }
 
 }
 
+export class sideUI{
+
+    private _pos:Vec2;
+    private _unitSize:Vec2;
+    private _rescale:number;
+    private _currPos:Vec2;
+    private _currUnitSize:Vec2;
+    private _bound:any[] = [];
+    private _spr:CustomizedSprite;
+    private _posPair:KVPair<Vec2> = new KVPair<Vec2>();
+    
+
+    constructor(pos:Vec2, unitSize:Vec2,rescale:number){
+        this._pos = pos;
+        this._unitSize = unitSize;
+        this._rescale = rescale;
+        this._currPos = new Vec2(pos.x*rescale,pos.y*rescale);
+        this._currUnitSize = new Vec2(unitSize.x*rescale,unitSize.y*rescale);
+        EventCentre.instance.on(EventCentre.EType.PERFORMANCE_RESCALE(),this,(rescale:number)=>{
+            this._rescale = rescale;
+            this._currPos = new Vec2(this._pos.x*this._rescale,this._pos.y*this._rescale);
+            this._currUnitSize = new Vec2(this._unitSize.x*this._rescale,this._unitSize.y*this._rescale);
+        });
+        this._spr = new CustomizedSprite();
+        this._spr.pos(this._currPos.x, this._currPos.y);
+        
+    }
+
+    public pushActor(bound:Symbolized,name:string):CustomizedSprite{
+
+        let tmpSpr:CustomizedSprite = new CustomizedSprite();
+        let info:any[] = [bound.symbol.data];
+        this._bound.push(info);
+        let initpos:Vec2 = new Vec2(0,this._currUnitSize.y*(this._bound.length-1));
+        this._posPair.edit(bound.symbol.data+"",initpos);
+        tmpSpr.pos(initpos.x,initpos.y).size(this._currUnitSize.x,this._currUnitSize.y);
+        this._spr.addChild(tmpSpr);
+        tmpSpr.loadImage(`res/png/${name}.png`);
+        this._spr.size(this._currUnitSize.x,this._currUnitSize.y*this._bound.length);
+        return tmpSpr;
+        
+    }
+
+
+    public getSpr():CustomizedSprite{
+        return this._spr;
+    }
+
+    public getPos():Vec2{
+        return this._pos;
+    }
+
+    public getSize():Vec2{
+        return this._unitSize;
+    }
+
+    public getscale():number{
+        return this._rescale;
+    }
+
+    public readPairForPos(bound:Symbolized):Vec2{
+        return this._posPair.read(bound.symbol.data+"");
+    }
+
+}

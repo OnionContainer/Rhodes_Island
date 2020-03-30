@@ -99,4 +99,10 @@ export interface Renderer{
      * @param ani 
      */
     displayAni(bound:Symbolized,name:string,ani:string,loopOrNot:boolean):void
+
+    loadSideUI(pos:Vec2,unitsize:Vec2):void
+
+
+    pushActIntoSideUI(bound:Symbolized,name:string):void
+
 }

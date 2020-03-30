@@ -47,6 +47,10 @@ class EType {
     public PERFORMANCE_TEXT_SWITCH():string{
         return "TEXT_SWITCH";
     }
+
+    public PERFORMANCE_ACTOR_ON_BOARD(symb:number){
+        return `ACTOR_${symb}_ON_BOARD`;
+    }
     /**
      * new added for performance ends here
      */
