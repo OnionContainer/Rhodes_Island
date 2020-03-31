@@ -1,7 +1,7 @@
 //author Na2CuC4O8
 
 import CustomizedSprite from "./customizedSpr";
-import { ChessBoard } from "./UnsymbolizedRender";
+import { ChessBoard, sideUI } from "./UnsymbolizedRender";
 import ActorRU from "./SymbolizedRender";
 import { ActorBox } from "./objbox";
 import { Vec2 } from "../../DodMath";
@@ -13,7 +13,8 @@ export default class PerformanceCentre implements Renderer{
 
     public static instance:PerformanceCentre;//单例（请不要手动新建单例）
     public mainSpr:CustomizedSprite;//默认绘图节点（禁止在该节点上绘图，只能用于添加子节点）
-    private chessBoard:ChessBoard;//默认棋盘
+    public chessBoard:ChessBoard;//默认棋盘
+    private ui:sideUI;//默认侧边干员UI
 
     /**
      * 初始化渲染主场景，初始化事件监听类
@@ -192,4 +193,54 @@ export default class PerformanceCentre implements Renderer{
         tmpActor.loadAni(name,ani,loopOrNot);//加载动作
     }
 
+/**
+     * 初始化侧面UI
+     * 侧面UI的父节点为！！！！棋盘！！！！！！
+     * @param pos 相对于棋盘坐标
+     * @param unitsize 干员立绘大小
+     * 
+     */
+    public loadSideUI(pos:Vec2,unitsize:Vec2):void{
+        PerformanceCentre.instance.ui = new sideUI(pos,unitsize,1);//初始化侧面UI
+    }
+
+    /**
+     * 向侧面UI插入干员立绘并开启鼠标事件监听
+     * @param bound actor对象
+     * @param name 干员立绘名见xlsx文件
+     */
+    public pushActIntoSideUI(bound:Symbolized,name:string):void{
+        PerformanceCentre.instance.chessBoard.addChild(PerformanceCentre.instance.ui.getSpr());//添加为棋盘子节点
+        let tmpspr:CustomizedSprite = PerformanceCentre.instance.ui.pushActor(bound,name);//干员信息写入UI中数组
+        
+        let fun:Function = () =>{
+            //根据鼠标相对于棋盘坐标换算干员所处坐标
+            let tmpvec:Vec2 = PerformanceCentre.instance.chessBoard.returnMouseVec();
+            tmpspr.pos(tmpvec.x - PerformanceCentre.instance.ui.getPos().x - 0.5*PerformanceCentre.instance.ui.getSize().x,tmpvec.y - PerformanceCentre.instance.ui.getPos().y- 0.5*PerformanceCentre.instance.ui.getSize().y);
+        }
+        tmpspr.on(Laya.Event.MOUSE_DOWN,this,()=>{
+            //监听鼠标按下事件
+            Laya.timer.loop(17,this,fun);//开启帧循环
+
+        });
+
+        tmpspr.on(Laya.Event.MOUSE_UP,this,() => {
+            //监听鼠标抬起事件
+            Laya.timer.clear(this,fun);//终止帧循环
+            
+            if(PerformanceCentre.instance.chessBoard.getboardsize().x >= PerformanceCentre.instance.chessBoard.returnMouseVec().x && PerformanceCentre.instance.chessBoard.getboardsize().y >= PerformanceCentre.instance.chessBoard.returnMouseVec().y && PerformanceCentre.instance.chessBoard.returnMouseVec().y >= 0 && PerformanceCentre.instance.chessBoard.returnMouseVec().x >= 0){
+                //当mouse_up时鼠标在棋盘上
+                let tmpvec:Vec2 = new Vec2(Math.floor(PerformanceCentre.instance.chessBoard.returnMouseVec().x/PerformanceCentre.instance.ui.getscale()/PerformanceCentre.instance.chessBoard.getUnitSize().x)*PerformanceCentre.instance.chessBoard.getUnitSize().x,Math.floor(PerformanceCentre.instance.chessBoard.returnMouseVec().y/PerformanceCentre.instance.ui.getscale()/PerformanceCentre.instance.chessBoard.getUnitSize().y)*PerformanceCentre.instance.chessBoard.getUnitSize().y);
+                EventCentre.instance.event(EventCentre.EType.PERFORMANCE_ACTOR_ON_BOARD(bound.symbol.data),tmpvec);//发送干员到达棋盘事件并发送棋盘坐标
+                tmpspr.destroy();//摧毁立绘对象
+            }else{
+                //当mouse_up时鼠标不在棋盘上
+                tmpspr.pos(PerformanceCentre.instance.ui.readPairForPos(bound).x,PerformanceCentre.instance.ui.readPairForPos(bound).y);
+            }
+ 
+
+
+        });
+
+    }
 }
