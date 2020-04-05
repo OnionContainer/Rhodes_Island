@@ -210,13 +210,15 @@ export default class PerformanceCentre implements Renderer{
      * @param name 干员立绘名见xlsx文件
      */
     public pushActIntoSideUI(bound:Symbolized,name:string):void{
-        PerformanceCentre.instance.chessBoard.addChild(PerformanceCentre.instance.ui.getSpr());//添加为棋盘子节点
-        let tmpspr:CustomizedSprite = PerformanceCentre.instance.ui.pushActor(bound,name);//干员信息写入UI中数组
+        let board:ChessBoard = PerformanceCentre.instance.chessBoard;
+        let ui:sideUI = PerformanceCentre.instance.ui;
+        board.addChild(ui.getSpr());//添加为棋盘子节点
+        let tmpspr:CustomizedSprite = ui.pushActor(bound,name);//干员信息写入UI中数组
         
         let fun:Function = () =>{
             //根据鼠标相对于棋盘坐标换算干员所处坐标
             let tmpvec:Vec2 = PerformanceCentre.instance.chessBoard.returnMouseVec();
-            tmpspr.pos(tmpvec.x - PerformanceCentre.instance.ui.getPos().x - 0.5*PerformanceCentre.instance.ui.getSize().x,tmpvec.y - PerformanceCentre.instance.ui.getPos().y- 0.5*PerformanceCentre.instance.ui.getSize().y);
+            tmpspr.pos(tmpvec.x - ui.getPos().x - 0.5*ui.getSize().x,tmpvec.y - ui.getPos().y- 0.5*ui.getSize().y);
         }
         tmpspr.on(Laya.Event.MOUSE_DOWN,this,()=>{
             //监听鼠标按下事件
@@ -227,15 +229,17 @@ export default class PerformanceCentre implements Renderer{
         tmpspr.on(Laya.Event.MOUSE_UP,this,() => {
             //监听鼠标抬起事件
             Laya.timer.clear(this,fun);//终止帧循环
-            
-            if(PerformanceCentre.instance.chessBoard.getboardsize().x >= PerformanceCentre.instance.chessBoard.returnMouseVec().x && PerformanceCentre.instance.chessBoard.getboardsize().y >= PerformanceCentre.instance.chessBoard.returnMouseVec().y && PerformanceCentre.instance.chessBoard.returnMouseVec().y >= 0 && PerformanceCentre.instance.chessBoard.returnMouseVec().x >= 0){
+            let boardsize:Vec2 = board.getboardsize();
+            let mouseloaction:Vec2 = board.returnMouseVec();
+            let unitsize:Vec2 = board.getUnitSize();
+            if(boardsize.x >= mouseloaction.x && boardsize.y >= mouseloaction.y && mouseloaction.y >= 0 && mouseloaction.x >= 0){
                 //当mouse_up时鼠标在棋盘上
-                let tmpvec:Vec2 = new Vec2(Math.floor(PerformanceCentre.instance.chessBoard.returnMouseVec().x/PerformanceCentre.instance.ui.getscale()/PerformanceCentre.instance.chessBoard.getUnitSize().x)*PerformanceCentre.instance.chessBoard.getUnitSize().x,Math.floor(PerformanceCentre.instance.chessBoard.returnMouseVec().y/PerformanceCentre.instance.ui.getscale()/PerformanceCentre.instance.chessBoard.getUnitSize().y)*PerformanceCentre.instance.chessBoard.getUnitSize().y);
+                let tmpvec:Vec2 = new Vec2(Math.floor(mouseloaction.x/unitsize.x)*unitsize.x,Math.floor(mouseloaction.y/unitsize.y)*unitsize.y);
                 EventCentre.instance.event(EventCentre.EType.PERFORMANCE_ACTOR_ON_BOARD(bound.symbol.data),tmpvec);//发送干员到达棋盘事件并发送棋盘坐标
                 tmpspr.destroy();//摧毁立绘对象
             }else{
                 //当mouse_up时鼠标不在棋盘上
-                tmpspr.pos(PerformanceCentre.instance.ui.readPairForPos(bound).x,PerformanceCentre.instance.ui.readPairForPos(bound).y);
+                tmpspr.pos(ui.readPairForPos(bound).x,ui.readPairForPos(bound).y);
             }
  
 

@@ -35,7 +35,7 @@ export class ChessBoard extends CustomizedSprite{
         this._initSize = unitsize;
         this._scale = scale;
         this._posVec2 = new Vec2(this._initPos.x*this._scale, this._initPos.y*this._scale);
-        
+        this._initboardsize = new Vec2(unitsize.x*arr[0].length,unitsize.y*arr.length);
         this._unitSizeVec2 = new Vec2(this._initSize.x * this._scale,this._initSize.y * this._scale);//recalculate unitSize
         this._backGroundColor = backGroundColor;
         this._frontColor = frontColor;
