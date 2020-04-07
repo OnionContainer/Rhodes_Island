@@ -98,7 +98,7 @@ export interface Renderer{
      * @param name 
      * @param ani 
      */
-    displayAni(bound:Symbolized,name:string,ani:string,loopOrNot:boolean):void
+    displayAni(bound:Symbolized,name:string,ani:string, numOfFrames:number,scale:Vec2,loopOrNot:boolean):void
 
     loadSideUI(pos:Vec2,unitsize:Vec2):void
 

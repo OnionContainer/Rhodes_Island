@@ -36,6 +36,7 @@ class Main {
 			[0,0,0,0],
 			[0,0,0,0]
 		], new Vec2(50,50), new Vec2(100,100), "#ff00ff", "#ffff00");
+		
 		//test end
 
 		FixTime.init();

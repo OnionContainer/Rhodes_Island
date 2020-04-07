@@ -1,15 +1,15 @@
 //author Na2CuC4O8
-
 import CustomizedSprite from "./customizedSpr";
 import { ChessBoard, sideUI } from "./UnsymbolizedRender";
 import ActorRU from "./SymbolizedRender";
 import { ActorBox } from "./objbox";
 import { Vec2 } from "../../DodMath";
-import { Symbolized } from "../../../Fix/FixSymbol";
 import { EventCentre } from "../../../Event/EventCentre";
 import { Renderer } from "../../Renderer";
+import { Symbolized } from "../../../Fix/FixSymbol";
 
 export default class PerformanceCentre implements Renderer{
+    
 
     public static instance:PerformanceCentre;//单例（请不要手动新建单例）
     public mainSpr:CustomizedSprite;//默认绘图节点（禁止在该节点上绘图，只能用于添加子节点）
@@ -28,6 +28,7 @@ export default class PerformanceCentre implements Renderer{
         EventCentre.init();//初始化观察者
         PerformanceCentre.initialize = () => {};//清空主场景初始化函数
         // console.log("Main Scene Initialization Complete!!");
+
 
     }
 
@@ -65,7 +66,6 @@ export default class PerformanceCentre implements Renderer{
      */
     public displayActor(bound: Symbolized, pos: Vec2, siz:Vec2 = new Vec2(10,10), color:string = "#00ff00", father:CustomizedSprite = PerformanceCentre.instance.chessBoard): void {
         let tmpActor:ActorRU = new ActorRU(bound.symbol,pos,siz,father,color);//渲染actor
-	tmpActor.loadAni("angel_normal","start");
     }
     
     /**
@@ -97,8 +97,6 @@ export default class PerformanceCentre implements Renderer{
      * @param to 遭受打击节点
      */
     public defaultAtkEffect(from: Symbolized, to: Symbolized): void {
-        ActorBox.get(from.symbol.data).clearAni();
-        ActorBox.get(from.symbol.data).loadAni("angel_normal","attack",true);
         //打击事件、发动攻击节点和遭受攻击节点参数
         ActorBox.get(from.symbol.data).hit(to);
         
@@ -118,10 +116,13 @@ export default class PerformanceCentre implements Renderer{
     /**
      * 销毁对象（默认销毁）
      * @param bound 对象
+     * @param pos 坐标（一律按全局缩放比为1计算，渲染器会根据全局缩放比自动完成缩放渲染）
      */
     public distroyActor(bound: Symbolized): void {
         let tmpActor:ActorRU = ActorBox.get(bound.symbol.data);//获取actorRU对象
+
         tmpActor.destory();
+
         //销毁actorRU对象
     }
 
@@ -185,15 +186,17 @@ export default class PerformanceCentre implements Renderer{
      * @param bound 待渲染对象
      * @param name 干员或敌人代号
      * @param ani 动作代号
+     * @param numOfFrames 动作执行帧数 默认16帧
+     * @param scale 动画图形在x，y方向上缩放比 默认(0.25,0.17)
      * @param loopOrNot 是否开启动作帧循环（默认关闭）
      */
-    public displayAni(bound: Symbolized, name: string, ani: string , loopOrNot:boolean = false): void {
-        let tmpActor:ActorRU = ActorBox.get(bound.symbol.data);//获取待渲染ARU
-        tmpActor.clearAni();//清理动作
-        tmpActor.loadAni(name,ani,loopOrNot);//加载动作
+    public displayAni(bound: Symbolized, name: string, ani: string , numOfFrames:number = 16, scale:Vec2 = new Vec2(0.25,0.17), loopOrNot:boolean = false): void {
+        let tmpActor:ActorRU = ActorBox.get(bound.symbol.data);
+        tmpActor.clearAni();
+        tmpActor.loadAni(name,ani,loopOrNot,numOfFrames,scale);
     }
 
-/**
+    /**
      * 初始化侧面UI
      * 侧面UI的父节点为！！！！棋盘！！！！！！
      * @param pos 相对于棋盘坐标
@@ -207,7 +210,7 @@ export default class PerformanceCentre implements Renderer{
     /**
      * 向侧面UI插入干员立绘并开启鼠标事件监听
      * @param bound actor对象
-     * @param name 干员立绘名见xlsx文件
+     * @param name 干员立绘名
      */
     public pushActIntoSideUI(bound:Symbolized,name:string):void{
         let board:ChessBoard = PerformanceCentre.instance.chessBoard;
@@ -218,7 +221,9 @@ export default class PerformanceCentre implements Renderer{
         let fun:Function = () =>{
             //根据鼠标相对于棋盘坐标换算干员所处坐标
             let tmpvec:Vec2 = PerformanceCentre.instance.chessBoard.returnMouseVec();
-            tmpspr.pos(tmpvec.x - ui.getPos().x - 0.5*ui.getSize().x,tmpvec.y - ui.getPos().y- 0.5*ui.getSize().y);
+            let uipos:Vec2 = ui.getPos();
+            let uisize:Vec2 = ui.getSize();
+            tmpspr.pos(tmpvec.x - uipos.x - 0.5*uisize.x,tmpvec.y - uipos.y- 0.5*uisize.y);
         }
         tmpspr.on(Laya.Event.MOUSE_DOWN,this,()=>{
             //监听鼠标按下事件
@@ -239,7 +244,8 @@ export default class PerformanceCentre implements Renderer{
                 tmpspr.destroy();//摧毁立绘对象
             }else{
                 //当mouse_up时鼠标不在棋盘上
-                tmpspr.pos(ui.readPairForPos(bound).x,ui.readPairForPos(bound).y);
+                let tmpvec:Vec2 = ui.readPairForPos(bound);
+                tmpspr.pos(tmpvec.x,tmpvec.y);
             }
  
 
@@ -247,4 +253,6 @@ export default class PerformanceCentre implements Renderer{
         });
 
     }
+
+
 }

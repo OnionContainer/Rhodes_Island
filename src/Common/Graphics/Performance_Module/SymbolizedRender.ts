@@ -1,13 +1,12 @@
 //author Na2CuC4O8
 
-import CustomizedSprite from "./customizedSpr";
-import { ActorBox } from "./objbox";
-import { Bar, Button , Text } from "./ActorComponent";
 import { MySymbol, Symbolized } from "../../../Fix/FixSymbol";
 import { Vec2 } from "../../DodMath";
-import { KVPair } from "../../DodDataStructure";
+import CustomizedSprite from "./customizedSpr";
+import { ActorBox } from "./objbox";
 import { EventCentre } from "../../../Event/EventCentre";
-
+import { Bar, Button , Text } from "./ActorComponent";
+import { KVPair } from "../../DodDataStructure";
 
 export default class ActorRU{
     private _initPos:Vec2;//actor起始坐标
@@ -29,7 +28,8 @@ export default class ActorRU{
     private _fist:CustomizedSprite;//攻击特效显示节点
     private _movePercentage:number = 0;//攻击特效参数暂存器
     public _centerPos:Vec2;//中心坐标
-    private _ani:Laya.Animation;
+    private _ani:Laya.Animation = new Laya.Animation();
+
 
     /**
      * RenderUnit构造器
@@ -44,7 +44,7 @@ export default class ActorRU{
         this._initSize = size;//起始宽高
         this._spr = new CustomizedSprite();//新建绘图节点
         this._father.addChild(this._spr);//添加子节点
-        this.setData(symb,new Vec2(this._initPos.x*this._scale,this._initPos.y*this._scale),new Vec2(this._initSize.x*this._scale, this._initSize.y*this._scale),color);//设置绘图节点参数
+        this.setData(symb,new Vec2(this._initPos.x*this._scale,this._initPos.y*this._scale),new Vec2(this._initSize.x*this._scale, this._initSize.y*this._scale),undefined);//设置绘图节点参数
         ActorBox.add(this,this._symb);//将本对象添加到键值对
         this.addDefBar();//添加默认进度条
         this._text = new Text(this._initSize,this._scale);//添加默认文本
@@ -59,27 +59,30 @@ export default class ActorRU{
         this._spr.addChild(this._damage);//
         this._damage.setParam(0,0,this._size.x,this._size.y,"#f91526");//
         this._damage.locationAndSize();//
+        this._damage.zOrder = 99;
         this.addDefButtons();//
         this._fist = new CustomizedSprite();//
         this._fist.setParam(this._centerPos.x,this._centerPos.y,16,16,"#F3C246");//
         this._fist.locationAndSize();//
         this._fist.zOrder = 2;//
         this._spr.addChild(this._fist);//
-        this._ani = new Laya.Animation();
         
 
+
     }
-public clearAni():void{
+    
+    
+    public clearAni():void{
         this._ani.clear();
     }
 
 
     
 
-    public loadAni(name:string,status:string, loopOrNot:boolean = false):Laya.Animation{
-        
+    public loadAni(name:string,status:string, loopOrNot:boolean, numOfFrames:number, scale:Vec2):Laya.Animation{
+        this._ani = new Laya.Animation();
         this._ani.pos(-17*this._scale,-8*this._scale);
-        this._ani.scale(0.25*this._scale,0.18*this._scale);
+        this._ani.scale(scale.x,scale.y);
         this._spr.addChild(this._ani);
         this._ani.loadAtlas(`res/atlas/${name}.atlas`,Laya.Handler.create(this,onLoaded)); 
         
@@ -100,12 +103,13 @@ public clearAni():void{
         function onLoaded(){
             
             this._ani.interval = 50;
-            let tmpAni = createAniUrls(`${name}/${status}`,16);
+            let tmpAni = createAniUrls(`${name}/${status}`,numOfFrames);
             this._ani.loadImages(tmpAni);
             
         }
         return this._ani;
     }
+
 
     /**
      * 返回当前可视节点坐标
@@ -120,17 +124,15 @@ public clearAni():void{
      * @param to 打击目标
      */
     public hit(to:Symbolized):void{
-        // this._fist.graphics.save();
         this._fist.centralShiftColored();
         let tmpVec:Vec2 = new Vec2(ActorBox.get(to.symbol.data).curPos().x-this._pos.x,ActorBox.get(to.symbol.data).curPos().y-this._pos.y);
         let fun:Function = (target:Vec2) =>{
             if(this._movePercentage > 1){
                 this._movePercentage = 0;
                 this._fist.graphics.clear();
-                // this._fist.graphics.restore();
                 Laya.timer.clear(this,fun);
                 ActorBox.get(to.symbol.data).damage();
-	//this._ani.stop();
+                // this._ani.stop();
                 return;
     
             }
@@ -140,7 +142,7 @@ public clearAni():void{
             this._fist.rotation = 2000 * this._movePercentage;
         };
         Laya.timer.loop(20,this,fun,[tmpVec]);
-
+        
     }
 
     /**
@@ -169,15 +171,18 @@ public clearAni():void{
     /**
      * 渲染默认按钮
      */
-    private showDefaultBottons():void{
+    private showDefaultBottons(e:Laya.Event):void{
+        e.stopPropagation();
         if(this._defButtonShowed === false){
-            this._spr.addChild(this._buttonPair.read(0+"").getSpr());
-            this._spr.addChild(this._buttonPair.read(1+"").getSpr());
+            this._spr.addChild(this.getButton(0).getSpr());
+            this._spr.addChild(this.getButton(1).getSpr());
             this._defButtonShowed = true;
+            // console.log(this._text._switch);
         }else{
-            this._spr.removeChild(this._buttonPair.read(0+"").getSpr());
-            this._spr.removeChild(this._buttonPair.read(1+"").getSpr());
+            this._spr.removeChild(this.getButton(0).getSpr());
+            this._spr.removeChild(this.getButton(1).getSpr());
             this._defButtonShowed = false;
+            // console.log(this._text._switch);
         }
     }
     
@@ -206,8 +211,8 @@ public clearAni():void{
         this.setColor();
         this._damage.setParam(0,0,this._initSize.x*this._scale,this._initSize.y*this._scale);
         this._damage.locationAndSize();
-        //this._ani.scale(0.25*value,0.18*value);
-        //this._ani.pos(-17*value,-8*value);
+        // this._ani.scale(0.25*value,0.18*value);
+        // this._ani.pos(-17*value,-8*value);
         
 
     }
@@ -332,6 +337,8 @@ public clearAni():void{
         let tmp2:Button = new Button(this._symb,"Activate_Skill",0,new Vec2(this._initSize.x,this._initSize.y),new Vec2(20,15),undefined,this._scale);
         this._buttonPair.edit("1",tmp2);
         this._buttonHeight = this._initSize.y + 16;
+        let tmp3:Button = new Button(this._symb,"",999,new Vec2(0,0),new Vec2(0,0),undefined,this._scale);
+        this._spr.addChild(tmp3.getSpr());
     }
 
 
